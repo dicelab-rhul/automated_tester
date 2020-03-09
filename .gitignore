@@ -1,0 +1,6 @@
+*.zip
+*.bak
+assignment1
+*.pyc
+__pycache__/**
+output*
