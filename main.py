@@ -3,20 +3,11 @@
 from argparse import ArgumentParser, Namespace
 from sys import exit
 from os import walk, listdir
-from os.path import exists, isdir, isfile, join
+from os.path import exists, isdir, isfile, join, basename
 from pwn import process
 from json import load, dumps
 from re import match
 from sys import version_info
-
-
-if version_info[0] < 3:
-    print("Unsupported python version: {}".format(version_info))
-    exit(-1)
-elif version_info[0] == 3 and version_info[1] < 8:
-    from pprint import pprint as pp
-else:
-    from pprint import pp
 
 
 test_cases_with_syntax_errors: list = []
@@ -41,24 +32,25 @@ def main() -> None:
             print("{} is not a valid directory. Aborting...".format(directory))
             exit(-1)
 
+    submission_id: str = basename(code_directory)
+
     if not listdir(code_directory):
-        print("Empty submission!")
+        print("Empty submission for {}. Not performing any test.".format(submission_id))
         exit(-1)
 
     test_cases: list = generate_test_cases(test_cases_file=test_cases_file)
 
     if test_cases_file is None:
-        print("{} is not a valid file. Aborting...".format(test_cases_file))
+        print("{} is malformed or not a valid file. Cannot load the test cases. Aborting...".format(test_cases_file))
         exit(-1)
 
     check_for_syntax_errors(test_cases=test_cases, code_directory=code_directory, tests_directory=tests_directory)
     result: dict = check_submission(test_cases=test_cases, code_directory=code_directory, tests_directory=tests_directory)
 
-    print("\nResult: correct: {}, to manually review (incorrect or with syntax errors or crashed): {}\n".format(result["correct"], result["to_manually_review"]))
+    print("\nResult for {}: correct: {}, to manually review (incorrect or with syntax errors or crashed): {}\n".format(submission_id, result["correct"], result["to_manually_review"]))
 
     if len(test_cases_with_syntax_errors) > 0:
-        print("\n##### The submission has syntax errors in the following test cases! It must be manually reviewed. #####\n")
-        #pp(test_cases_with_syntax_errors)
+        print("\n##### The submission for {} has syntax errors in the following test cases! It must be manually reviewed. #####\n".format(submission_id))
         print(dumps(obj=test_cases_with_syntax_errors, indent=4))
 
 
