@@ -4,3 +4,4 @@ assignment1
 *.pyc
 __pycache__/**
 output*
+run_output.txt
