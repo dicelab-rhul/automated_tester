@@ -7,7 +7,16 @@ from os.path import exists, isdir, isfile, join
 from pwn import process
 from json import load
 from re import match
-from pprint import pp
+from sys import version_info
+
+
+if version_info[0] < 3:
+    print("Unsupported python version: {}".format(version_info))
+    exit(-1)
+elif version_info[0] == 3 and version_info[1] < 8:
+    from pprint import pprint as pp
+else:
+    from pprint import pp
 
 
 test_cases_with_syntax_errors: list = []
