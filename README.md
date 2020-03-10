@@ -5,7 +5,6 @@ You may need to install the following:
 ```console
 $ pip3 install argparse
 $ pip3 install pwntools
-$ pip3 install pprint
 ```
 
 # Run the script
