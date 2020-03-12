@@ -8,6 +8,7 @@ from pwn import process
 from json import load, dumps
 from re import match
 from sys import version_info
+from shutil import which
 
 
 test_cases_with_syntax_errors: list = []
@@ -36,6 +37,10 @@ def main() -> None:
 
     if not listdir(code_directory):
         print("Empty submission for {}. Not performing any test.".format(submission_id))
+        exit(-1)
+
+    if which("swipl") is None:
+        print("swipl not found. Aborting...")
         exit(-1)
 
     test_cases: list = generate_test_cases(test_cases_file=test_cases_file)
