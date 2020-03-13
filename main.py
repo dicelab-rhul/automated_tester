@@ -179,7 +179,7 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
 
             if missing_files(code_directory=code_directory, cmd=cmd):
                 test_cases_with_syntax_errors.append(test_case)
-                test_result[part]["to_manually_review"] = len(queries)
+                test_result[part]["to_manually_review"] += len(queries)
                 continue
 
             p = process(cmd)
@@ -191,7 +191,9 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
                 output: str = str(p.recv(), "utf-8")
 
                 if output.startswith("ERROR"):
-                    test_cases_with_syntax_errors.append(test_case)
+                    if test_case not in test_cases_with_syntax_errors:
+                        test_cases_with_syntax_errors.append(test_case)
+
                     test_result[part]["to_manually_review"] += 1
                     continue
 
