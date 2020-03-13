@@ -2,13 +2,14 @@
 
 from argparse import ArgumentParser, Namespace
 from sys import exit
-from os import walk, listdir
+from os import walk, listdir, rename
 from os.path import exists, isdir, isfile, join, basename
 from pwn import process
 from json import load, dumps
 from re import match
 from sys import version_info
 from shutil import which
+from traceback import print_exc
 
 
 test_cases_with_syntax_errors: list = []
@@ -21,7 +22,7 @@ parts_weights: dict = {
     "T2(a)": 12,
     "T2(b)": 12,
     "T2(c)": 12,
-    "T2(d)": 12,
+    "T2(d)": 20,
 }
 
 
@@ -60,6 +61,8 @@ def main() -> None:
         print("{} is malformed or not a valid file. Cannot load the test cases. Aborting...".format(test_cases_file))
         exit(-1)
 
+    preprocess_submission(code_directory=code_directory)
+
     #check_for_syntax_errors(test_cases=test_cases, code_directory=code_directory, tests_directory=tests_directory)
     result: dict = check_submission(test_cases=test_cases, code_directory=code_directory, tests_directory=tests_directory)
 
@@ -74,6 +77,14 @@ def main() -> None:
     if len(test_cases_with_syntax_errors) > 0:
         print("\n##### The submission for {} has syntax errors in the following test cases! It must be manually reviewed. #####\n".format(submission_id))
         print(dumps(obj=test_cases_with_syntax_errors, indent=4))
+
+
+def preprocess_submission(code_directory: str) -> None:
+    for directory, _, files in walk(code_directory):
+        for f in files:
+            if f == "efficient_search.pl":
+                new_name: str = "efficient_searches.pl"
+                rename(join(directory, f), join(directory, new_name))
 
 
 def generate_test_cases(test_cases_file: str) -> list:
@@ -186,7 +197,9 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
                     correct += 1
                 else:
                     to_review += 1
-        except:
+        except Exception as e:
+            print("{}: got {}".format(cmd, repr(e)))
+            print_exc()
             test_cases_with_syntax_errors.append(test_case)
             to_review = len(test_case["queries"]) - correct 
         
