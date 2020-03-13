@@ -175,18 +175,23 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
             if len(cmd) == 5:
                 cmd[3] = join(code_directory, cmd[3])
 
+            queries: dict = test_case["queries"]
+
+            if missing_files(code_directory=code_directory, cmd=cmd):
+                test_cases_with_syntax_errors.append(test_case)
+                test_result[part]["to_manually_review"] = len(queries)
+                continue
+
             p = process(cmd)
             p.sendline("set_prolog_flag(answer_write_options,[quoted(true), portray(true), spacing(next_argument)]).")
             p.recv()
-            
-            queries: dict = test_case["queries"]
 
             for query, result in queries.items():
                 p.sendline(query)
                 output: str = str(p.recv(), "utf-8")
 
                 if output.startswith("ERROR"):
-                    test_case in test_cases_with_syntax_errors.append(test_case)
+                    test_cases_with_syntax_errors.append(test_case)
                     test_result[part]["to_manually_review"] += 1
                     continue
 
@@ -207,6 +212,25 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
         test_result[part]["to_manually_review"] += to_review
 
     return test_result
+
+
+def missing_files(code_directory: str, cmd: list) -> bool:
+    to_check: list = []
+
+    to_check.append(join(code_directory, basename(cmd[2])))
+    to_check.append(join(code_directory, basename(cmd[3])))
+
+    if len(cmd) == 5:
+        to_check.append(join(code_directory, basename(cmd[4])))
+
+    for f in to_check:
+        if basename(f).startswith("test"):
+            continue
+        if not exists(f) or not isfile(f):
+            print("The submission is missing {}".format(f))
+            return True
+
+    return False
     
 
 def check_output(cmd: list, query: str, expected_result: str, output) -> bool:
