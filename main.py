@@ -49,7 +49,7 @@ def main() -> None:
         print("{} is malformed or not a valid file. Cannot load the test cases. Aborting...".format(test_cases_file))
         exit(-1)
 
-    check_for_syntax_errors(test_cases=test_cases, code_directory=code_directory, tests_directory=tests_directory)
+    #check_for_syntax_errors(test_cases=test_cases, code_directory=code_directory, tests_directory=tests_directory)
     result: dict = check_submission(test_cases=test_cases, code_directory=code_directory, tests_directory=tests_directory)
 
     print("\nResult for {}: correct: {}, to manually review (incorrect or with syntax errors or crashed): {}\n".format(submission_id, result["correct"], result["to_manually_review"]))
@@ -105,9 +105,9 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
     }
 
     for test_case in test_cases:
-        if test_case in test_cases_with_syntax_errors:
-            test_result["to_manually_review"] += len(test_case["queries"])
-            continue
+        #if test_case in test_cases_with_syntax_errors:
+            #test_result["to_manually_review"] += len(test_case["queries"])
+            #continue
 
         correct: int = 0
         to_review: int = 0
@@ -121,18 +121,28 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
                 cmd[3] = join(code_directory, cmd[3])
 
             p = process(cmd)
-            str(p.recv(), "utf-8")
+            p.sendline("set_prolog_flag(answer_write_options,[quoted(true), portray(true), spacing(next_argument)]).")
+            p.recv()
+            
             queries: dict = test_case["queries"]
 
             for query, result in queries.items():
                 p.sendline(query)
-                output = str(p.recv(), "utf-8")
+                output: str = str(p.recv(), "utf-8")
+
+                if output.startswith("ERROR"):
+                    test_case in test_cases_with_syntax_errors.append(test_case)
+                    test_result["to_manually_review"] += len(test_case["queries"])
+                    continue
+
+                while output.startswith("Welcome to") or output.startswith("Warning") or "true." in output:
+                    output = str(p.recv(), "utf-8")
 
                 if check_output(cmd=cmd, query=query, expected_result=result, output=output):
                     correct += 1
                 else:
                     to_review += 1
-        except:
+        except Exception as e:
             test_cases_with_syntax_errors.append(test_case)
             to_review = len(test_case["queries"]) - correct 
         
@@ -144,7 +154,7 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
 
 def check_output(cmd: list, query: str, expected_result: str, output) -> bool:
     m: match = match("Res = \[.*\]\.", output)
-    result: bool = m and m[0] == expected_result
+    result: bool = m is not None and (m[0] == expected_result or can_match(m[0], expected_result))
 
     print("'{}', query: '{}' --> OK ? {}".format(cmd, query, result))
     print("Expected: {}".format(expected_result))
@@ -158,6 +168,24 @@ def check_output(cmd: list, query: str, expected_result: str, output) -> bool:
         return False
     else:
         return result
+
+def can_match(unordered: str, ordered: str) -> bool:
+    u: str = unordered[7:-1]
+    o: str = ordered[7:-1]
+
+    u_tokens = u.split(", ")
+    o_tokens = o.split(", ")
+
+    if len(u_tokens) != len(o_tokens):
+        return False
+
+    for token in o_tokens:
+        if token not in u_tokens:
+            return False
+        else:
+            u_tokens.remove(token)
+
+    return True
 
 
 if __name__ == "__main__":
