@@ -110,9 +110,9 @@
             "findall(X, dldfs([a], 6, X), Res).": "Res = [[a, b, g], [a, b, g, e, h], [a, b, g, e, i, k], [a, e, h], [a, e, i, k]].",
             "findall(X, ids([a], 1, 1, X), Res).": "Res = [].",
             "findall(X, ids([a], 1, 2, X), Res).": "Res = [[a, b, g], [a, e, h]].",
-            "findall(X, ids([a], 1, 3, X), Res).": "Res = [[a, b, g], [a, e, h], [a, e, i, k]].",
-            "findall(X, ids([a], 1, 4, X), Res).": "Res = [[a, b, g], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, e, h], [a, e, i, k]].",
-            "findall(X, ids([a], 1, 5, X), Res).": "Res = [[a, b, g], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, b, g, e, i, k], [a, e, h], [a, e, i, k]]."
+            "findall(X, ids([a], 1, 3, X), Res).": "Res = [[a, b, g], [a, e, h], [a, b, g], [a, e, h], [a, e, i, k]].",
+            "findall(X, ids([a], 1, 4, X), Res).": "Res = [[a, b, g], [a, e, h], [a, b, g], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, e, h], [a, e, i, k]].",
+            "findall(X, ids([a], 1, 5, X), Res).": "Res = [[a, b, g], [a, e, h], [a, b, g], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, b, g, e, i, k], [a, e, h], [a, e, i, k]]."
         },
         "part": "T2(d)"
     }

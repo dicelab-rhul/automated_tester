@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This is to test all the submissions in a go.
+
 SWIPL="swipl"
 
 if ! which ${SWIPL} 1>/dev/null; then
