@@ -3,49 +3,57 @@
         "cmd": "swipl -l tree_search.pl breadth_first.pl test1.pl",
         "queries": {
             "findall(X, search([[a]], X), Res).": "Res = [[a, f, i]]."
-        }
+        },
+        "part": "T1(a)"
     },
     {
         "cmd": "swipl -l tree_search.pl breadth_first.pl test2.pl",
         "queries": {
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, d], [a, f, i], [a, f, i, j, m]]."
-        }
+        },
+        "part": "T1(a)"
     },
     {
         "cmd": "swipl -l tree_search.pl depth_first.pl test1.pl",
         "queries": {
             "findall(X, search([[a]], X), Res).": "Res = [[a, f, i]]."
-        }
+        },
+        "part": "T1(b)"
     },
     {
         "cmd": "swipl -l tree_search.pl depth_first.pl test2.pl",
         "queries": {
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, d], [a, f, i], [a, f, i, j, m]]."
-        }
+        },
+        "part": "T1(b)"
     },
     {
         "cmd": "swipl -l graph_search.pl breadth_first.pl test3.pl",
         "queries": {
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, d], [a, f, i], [a, f, i, j, m]]."
-        }
+        },
+        "part": "T1(c)"
     },
     {
         "cmd": "swipl -l graph_search.pl breadth_first.pl test4.pl",
         "queries": {
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, g], [a, e, h], [a, e, i, k], [a, b, g, e, h], [a, b, g, e, i, k]]."
-        }
+        },
+        "part": "T1(c)"
     },
     {
         "cmd": "swipl -l graph_search.pl depth_first.pl test3.pl",
         "queries": {
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, d], [a, f, i], [a, f, i, j, m]]."
-        }
+        },
+        "part": "T1(c)"
     },
     {
         "cmd": "swipl -l graph_search.pl depth_first.pl test4.pl",
         "queries": {
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, g], [a, b, g, e, h], [a, b, g, e, i, k], [a, e, h], [a, e, i, k]]."
-        }
+        },
+        "part": "T1(c)"
     },
     {
         "cmd": "swipl -l efficient_searches.pl test1.pl",
@@ -57,7 +65,8 @@
             "findall(X, ids([a], 1, 1, X), Res).": "Res = [].",
             "findall(X, ids([a], 1, 2, X), Res).": "Res = [[a, f, i]].",
             "findall(X, ids([a], 1, 3, X), Res).": "Res = [[a, f, i], [a, f, i]]."
-        }
+        },
+        "part": "T2(a)"
     },
     {
         "cmd": "swipl -l efficient_searches.pl test2.pl",
@@ -71,7 +80,8 @@
             "findall(X, ids([a], 1, 2, X), Res).": "Res = [[a, b, d], [a, f, i]].",
             "findall(X, ids([a], 1, 3, X), Res).": "Res = [[a, b, d], [a, f, i], [a, b, d], [a, f, i]].",
             "findall(X, ids([a], 1, 4, X), Res).": "Res = [[a, b, d], [a, f, i], [a, b, d], [a, f, i], [a, b, d], [a, f, i], [a, f, i, j, m]]."
-        }
+        },
+        "part": "T2(b)"
     },
     {
         "cmd": "swipl -l efficient_searches.pl test3.pl",
@@ -85,7 +95,8 @@
             "findall(X, ids([a], 1, 2, X), Res).": "Res = [[a, b, d], [a, f, i]].",
             "findall(X, ids([a], 1, 3, X), Res).": "Res = [[a, b, d], [a, f, i], [a, b, d], [a, f, i]].",
             "findall(X, ids([a], 1, 4, X), Res).": "Res = [[a, b, d], [a, f, i], [a, b, d], [a, f, i], [a, b, d], [a, f, i], [a, f, i, j, m]]."
-        }
+        },
+        "part": "T2(c)"
     },
     {
         "cmd": "swipl -l efficient_searches.pl test4.pl",
@@ -102,6 +113,7 @@
             "findall(X, ids([a], 1, 3, X), Res).": "Res = [[a, b, g], [a, e, h], [a, e, i, k]].",
             "findall(X, ids([a], 1, 4, X), Res).": "Res = [[a, b, g], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, e, h], [a, e, i, k]].",
             "findall(X, ids([a], 1, 5, X), Res).": "Res = [[a, b, g], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, b, g, e, i, k], [a, e, h], [a, e, i, k]]."
-        }
+        },
+        "part": "T2(d)"
     }
 ]

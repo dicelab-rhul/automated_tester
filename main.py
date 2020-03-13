@@ -13,6 +13,17 @@ from shutil import which
 
 test_cases_with_syntax_errors: list = []
 
+# The remaining point adding up to 100 are assigned after the code inspection (i.e., style).
+parts_weights: dict = {
+    "T1(a)": 10,
+    "T1(b)": 10,
+    "T1(c)": 10,
+    "T2(a)": 12,
+    "T2(b)": 12,
+    "T2(c)": 12,
+    "T2(d)": 12,
+}
+
 
 def main() -> None:
     parser: ArgumentParser = ArgumentParser()
@@ -52,7 +63,13 @@ def main() -> None:
     #check_for_syntax_errors(test_cases=test_cases, code_directory=code_directory, tests_directory=tests_directory)
     result: dict = check_submission(test_cases=test_cases, code_directory=code_directory, tests_directory=tests_directory)
 
-    print("\nResult for {}: correct: {}, to manually review (incorrect or with syntax errors or crashed): {}\n".format(submission_id, result["correct"], result["to_manually_review"]))
+
+    for part in result.keys():
+        result[part]["partial_mark"] = parts_weights[part] * result[part]["correct"] / (result[part]["correct"] + result[part]["to_manually_review"])
+
+
+    print("\nResult for {}:\n".format(submission_id))
+    print(dumps(obj=result, indent=4))
 
     if len(test_cases_with_syntax_errors) > 0:
         print("\n##### The submission for {} has syntax errors in the following test cases! It must be manually reviewed. #####\n".format(submission_id))
@@ -100,8 +117,34 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
     print("---------------------------------------------------")
 
     test_result: dict = {
-        "correct": 0,
-        "to_manually_review": 0
+        "T1(a)": {
+            "correct": 0,
+            "to_manually_review": 0
+        },
+        "T1(b)": {
+            "correct": 0,
+            "to_manually_review": 0
+        },
+        "T1(c)": {
+            "correct": 0,
+            "to_manually_review": 0
+        },
+        "T2(a)": {
+            "correct": 0,
+            "to_manually_review": 0
+        },
+        "T2(b)": {
+            "correct": 0,
+            "to_manually_review": 0
+        },
+        "T2(c)": {
+            "correct": 0,
+            "to_manually_review": 0
+        },
+        "T2(d)": {
+            "correct": 0,
+            "to_manually_review": 0
+        },
     }
 
     for test_case in test_cases:
@@ -113,6 +156,7 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
         to_review: int = 0
 
         try:
+            part: str = test_case["part"]
             cmd = test_case["cmd"].split(" ")
             cmd[2] = join(code_directory, cmd[2])
             cmd[-1] = join(tests_directory, cmd[-1])
@@ -132,7 +176,7 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
 
                 if output.startswith("ERROR"):
                     test_case in test_cases_with_syntax_errors.append(test_case)
-                    test_result["to_manually_review"] += len(test_case["queries"])
+                    test_result[part]["to_manually_review"] += 1
                     continue
 
                 while output.startswith("Welcome to") or output.startswith("Warning") or "true." in output:
@@ -142,12 +186,12 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
                     correct += 1
                 else:
                     to_review += 1
-        except Exception as e:
+        except:
             test_cases_with_syntax_errors.append(test_case)
             to_review = len(test_case["queries"]) - correct 
         
-        test_result["correct"] += correct
-        test_result["to_manually_review"] += to_review
+        test_result[part]["correct"] += correct
+        test_result[part]["to_manually_review"] += to_review
 
     return test_result
     
