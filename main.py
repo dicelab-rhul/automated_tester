@@ -10,10 +10,28 @@ from re import match
 from sys import version_info
 from shutil import which
 from traceback import print_exc
-from marking_config import parts_weights
 
 
 test_cases_with_errors: list = []
+
+
+def main() -> None:
+    args: list = parse_arguments()
+    
+    if not check_for_valid_submission(args=args):
+        return
+
+    if not check_for_software_dependencies():
+        return
+
+    parts_weights: dict = load_parts_weights(args[3])
+    submission_id: str = basename(args[0])
+    test_cases: list = generate_test_cases(test_cases_file=args[2])
+
+    preprocess_submission(code_directory=args[0])
+    result: dict = check_submission(test_cases=test_cases, code_directory=args[0], tests_directory=args[1], parts_weights=parts_weights)
+
+    process_result(result=result, submission_id=submission_id, parts_weights=parts_weights)
 
 
 def parse_arguments() -> list:
@@ -21,21 +39,23 @@ def parse_arguments() -> list:
     parser.add_argument("-d", "--code-directory", required=True, metavar="code_directory", type=str, help="The directory which contains the student code.")
     parser.add_argument("-t", "--tests-directory", required=False, metavar="tests_directory", type=str, help="The directory which contains the tests.")
     parser.add_argument("-c", "--test-cases-file", required=True, metavar="test_cases_file", type=str, help="The test cases file.")
+    parser.add_argument("-w", "--weights-file", required=True, metavar="weights_file", type=str, help="The config file with the parts' weights.")
 
     args: Namespace = parser.parse_args()
 
     code_directory: str = args.code_directory
     tests_directory: str = args.tests_directory
     test_cases_file: str = args.test_cases_file
+    weights_file: str = args.weights_file
 
     if tests_directory is None:
         tests_directory = code_directory
 
-    return [code_directory, tests_directory, test_cases_file]
+    return [code_directory, tests_directory, test_cases_file, weights_file]
 
 
 def check_for_valid_submission(args: list) -> bool:
-    if len(args) != 3:
+    if len(args) != 4:
         return False
 
     code_directory: str = args[0]
@@ -61,34 +81,20 @@ def check_for_software_dependencies() -> bool:
     return True
 
 
-def main() -> None:
-    args: list = parse_arguments()
-    
-    if not check_for_valid_submission(args=args):
-        return
-
-    if not check_for_software_dependencies():
-        return
-
-    submission_id: str = basename(args[0])
-    test_cases: list = generate_test_cases(test_cases_file=args[2])
-
-    preprocess_submission(code_directory=args[0])
-    result: dict = check_submission(test_cases=test_cases, code_directory=args[0], tests_directory=args[1])
-
-    process_result(result=result, submission_id=submission_id)
+def load_parts_weights(weights_file: str) -> None:
+    try:
+        with open(weights_file, "r") as i_f:
+            return load(i_f)
+    except Exception as e:
+        raise IOError("{} is malformed or not a valid file. Cannot load the parts' weights. Aborting...".format(weights_file)) from e
 
 
-def process_result(result: dict, submission_id: str) -> None:
-    if len(test_cases_with_errors) > 0:
-        print("\n##### The following test cases for submission {} errored out. Some marks may be still awarded after a manual review. #####\n".format(submission_id))
-        print(dumps(obj=test_cases_with_errors, indent=4))
-
-    for part in result.keys():
-        result[part]["partial_mark"] = parts_weights[part] * result[part]["correct"] / (result[part]["correct"] + result[part]["to_manually_review"])
-
-    print("\nResult for {}:\n".format(submission_id))
-    print(dumps(obj=result, indent=4))
+def generate_test_cases(test_cases_file: str) -> list:
+    try:
+        with open(test_cases_file, "r") as i_f:
+            return load(i_f)
+    except Exception as e:
+        raise IOError("{} is malformed or not a valid file. Cannot load the test cases. Aborting...".format(test_cases_file)) from e
 
 
 def preprocess_submission(code_directory: str) -> None:
@@ -100,15 +106,20 @@ def preprocess_submission(code_directory: str) -> None:
                 rename(join(directory, f), join(directory, new_name))
 
 
-def generate_test_cases(test_cases_file: str) -> list:
-    try:
-        with open(test_cases_file, "r") as i_f:
-            return load(i_f)
-    except Exception as e:
-        raise IOError("{} is malformed or not a valid file. Cannot load the test cases. Aborting...".format(test_cases_file)) from e
+def check_submission(test_cases: list, code_directory: str, tests_directory: str, parts_weights: dict) -> dict:
+    print("\n###################################################")
+    print("Checking {}".format(code_directory))
+    print("###################################################\n")
+
+    test_result: dict = build_test_result_stub(parts_weights=parts_weights)
+
+    for test_case in test_cases:
+        test_result = check_test_case(test_case=test_case, test_result=test_result, code_directory=code_directory, tests_directory=tests_directory)
+
+    return test_result
 
 
-def build_test_result_stub() -> dict:
+def build_test_result_stub(parts_weights: dict) -> dict:
     result: dict = {}
 
     for part in parts_weights.keys():
@@ -118,17 +129,6 @@ def build_test_result_stub() -> dict:
         }
 
     return result
-
-
-def build_swipl_command(test_case: dict, code_directory: str, tests_directory: str) -> list:
-    cmd = test_case["cmd"].split(" ")
-    cmd[2] = join(code_directory, cmd[2])
-    cmd[-1] = join(tests_directory, cmd[-1])
-
-    if len(cmd) == 5:
-       cmd[3] = join(code_directory, cmd[3])
-
-    return cmd
 
 
 def check_test_case(test_case: dict, test_result: dict, code_directory: str, tests_directory: str) -> dict:
@@ -179,17 +179,15 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
     return test_result
 
 
-def check_submission(test_cases: list, code_directory: str, tests_directory: str) -> dict:
-    print("\n###################################################")
-    print("Checking {}".format(code_directory))
-    print("###################################################\n")
+def build_swipl_command(test_case: dict, code_directory: str, tests_directory: str) -> list:
+    cmd = test_case["cmd"].split(" ")
+    cmd[2] = join(code_directory, cmd[2])
+    cmd[-1] = join(tests_directory, cmd[-1])
 
-    test_result: dict = build_test_result_stub()
+    if len(cmd) == 5:
+       cmd[3] = join(code_directory, cmd[3])
 
-    for test_case in test_cases:
-        test_result = check_test_case(test_case=test_case, test_result=test_result, code_directory=code_directory, tests_directory=tests_directory)
-
-    return test_result
+    return cmd
 
 
 def missing_files(code_directory: str, cmd: list, queries: list) -> bool:
@@ -250,6 +248,18 @@ def can_match(unordered: str, ordered: str) -> bool:
             u_tokens.remove(token)
 
     return True
+
+
+def process_result(result: dict, submission_id: str, parts_weights: dict) -> None:
+    if len(test_cases_with_errors) > 0:
+        print("\n##### The following test cases for submission {} errored out. Some marks may be still awarded after a manual review. #####\n".format(submission_id))
+        print(dumps(obj=test_cases_with_errors, indent=4))
+
+    for part in result.keys():
+        result[part]["partial_mark"] = parts_weights[part] * result[part]["correct"] / (result[part]["correct"] + result[part]["to_manually_review"])
+
+    print("\nResult for {}:\n".format(submission_id))
+    print(dumps(obj=result, indent=4))
 
 
 if __name__ == "__main__":
