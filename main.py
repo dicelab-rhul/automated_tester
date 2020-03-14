@@ -14,6 +14,8 @@ from traceback import print_exc
 
 test_cases_with_errors: list = []
 
+TIMEOUT=5
+
 
 def main() -> None:
     args: list = parse_arguments()
@@ -138,6 +140,7 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
     try:
         part: str = test_case["part"]
         cmd: list = build_swipl_command(test_case=test_case, code_directory=code_directory, tests_directory=tests_directory)
+        print("Trying {}".format(" ".join(cmd)))
         queries: dict = test_case["queries"]
 
         if missing_files(code_directory=code_directory, cmd=cmd, queries=queries.keys()):
@@ -147,14 +150,14 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
 
         p = process(cmd)
         p.sendline("set_prolog_flag(answer_write_options,[quoted(true), portray(true), spacing(next_argument)]).")
-        p.recv()
+        p.recv(timeout=TIMEOUT)
 
         for query, result in queries.items():
             p.sendline(query)
-            output: str = str(p.recv(), "utf-8")
+            output: str = str(p.recv(timeout=TIMEOUT), "utf-8")
 
             while output.startswith("Welcome to") or output.startswith("Warning") or "true." in output:
-                output = str(p.recv(), "utf-8")
+                output = str(p.recv(timeout=TIMEOUT), "utf-8")
 
             if "ERROR:" in output:
                 if test_case not in test_cases_with_errors:
