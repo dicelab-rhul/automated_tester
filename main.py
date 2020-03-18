@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser, Namespace
-from sys import exit
+from sys import exit, stdout
 from os import walk, listdir, rename
 from os.path import exists, isdir, isfile, join, basename
 from pwn import process
@@ -10,14 +10,16 @@ from re import match
 from sys import version_info
 from shutil import which
 from traceback import print_exc
+from colorama import Fore, Style, init as colorama_init
 
 
 test_cases_with_errors: list = []
 
-TIMEOUT=5
+TIMEOUT=50
 
 
 def main() -> None:
+    colorama_init()
     args: list = parse_arguments()
     
     if not check_for_valid_submission(args=args):
@@ -140,7 +142,12 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
     try:
         part: str = test_case["part"]
         cmd: list = build_swipl_command(test_case=test_case, code_directory=code_directory, tests_directory=tests_directory)
-        print("Trying {}".format(" ".join(cmd)))
+        
+        print("\n---------------------------------------------------")
+        print("Executing swipl command: {}".format(" ".join(cmd)))
+        print("---------------------------------------------------\n")
+        print("---------------------------------------------------")
+
         queries: dict = test_case["queries"]
 
         if missing_files(code_directory=code_directory, cmd=cmd, queries=queries.keys()):
@@ -151,8 +158,9 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
         p = process(cmd)
         p.sendline("set_prolog_flag(answer_write_options,[quoted(true), portray(true), spacing(next_argument)]).")
         p.recv(timeout=TIMEOUT)
-
         for query, result in queries.items():
+            print("{}T-case:   {}{}{}".format(Style.BRIGHT, Fore.BLUE, " ".join(cmd), Style.RESET_ALL))
+            print("{}Query:    {}{}{}".format(Style.BRIGHT, Fore.BLUE, query, Style.RESET_ALL))
             p.sendline(query)
             output: str = str(p.recv(timeout=TIMEOUT), "utf-8")
 
@@ -172,7 +180,7 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
                 to_review += 1
     except Exception as e:
         print("{}: got {}".format(cmd, repr(e)))
-        print_exc()
+        print_exc(file=stdout)
         test_cases_with_errors.append(test_case)
         to_review = len(test_case["queries"]) - correct 
     
@@ -184,11 +192,11 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
 
 def build_swipl_command(test_case: dict, code_directory: str, tests_directory: str) -> list:
     cmd = test_case["cmd"].split(" ")
-    cmd[2] = join(code_directory, cmd[2])
+    cmd[1] = join(code_directory, cmd[1])
     cmd[-1] = join(tests_directory, cmd[-1])
 
-    if len(cmd) == 5:
-       cmd[3] = join(code_directory, cmd[3])
+    if len(cmd) == 4:
+        cmd[2] = join(code_directory, cmd[2])
 
     return cmd
 
@@ -196,11 +204,11 @@ def build_swipl_command(test_case: dict, code_directory: str, tests_directory: s
 def missing_files(code_directory: str, cmd: list, queries: list) -> bool:
     to_check: list = []
 
+    to_check.append(join(code_directory, basename(cmd[1])))
     to_check.append(join(code_directory, basename(cmd[2])))
-    to_check.append(join(code_directory, basename(cmd[3])))
 
-    if len(cmd) == 5:
-        to_check.append(join(code_directory, basename(cmd[4])))
+    if len(cmd) == 4:
+        to_check.append(join(code_directory, basename(cmd[3])))
 
     for f in to_check:
         if basename(f).startswith("test"):
@@ -219,13 +227,18 @@ def check_output(cmd: list, query: str, expected_result: str, output) -> bool:
     m: match = match("Res = \[.*\]\.", output)
     result: bool = m is not None and (m[0] == expected_result or can_match(m[0], expected_result))
 
-    print("'{}', query: '{}' --> OK ? {}".format(cmd, query, result))
-    print("Expected: {}".format(expected_result))
+    if result:
+        color = Fore.GREEN
+    else:
+        color = Fore.RED
+
+    print("{}Passed?   {}{}{}".format(Style.BRIGHT, color, result, Style.RESET_ALL))
+    print("{}Expected: {}{}{}".format(Style.BRIGHT, Fore.YELLOW, expected_result, Style.RESET_ALL))
 
     if m:
-        print("Got:      {}".format(m[0]))
+        print("{}Got:      {}{}{}".format(Style.BRIGHT, Fore.YELLOW, m[0], Style.RESET_ALL))
     else:
-        print("Got:      {}".format(output.strip()))
+        print("{}Got:      {}{}{}".format(Style.BRIGHT, Fore.YELLOW, output.strip(), Style.RESET_ALL))
 
     print("---------------------------------------------------")
 
@@ -255,8 +268,10 @@ def can_match(unordered: str, ordered: str) -> bool:
 
 def process_result(result: dict, submission_id: str, parts_weights: dict) -> None:
     if len(test_cases_with_errors) > 0:
-        print("\n##### The following test cases for submission {} errored out. Some marks may be still awarded after a manual review. #####\n".format(submission_id))
+        print("\n{}{}##### The following test cases for submission {} errored out. Some marks may be still awarded after a manual review. #####{}\n".format(Style.BRIGHT, Fore.RED, submission_id, Style.RESET_ALL))
         print(dumps(obj=test_cases_with_errors, indent=4))
+    else:
+        print("\n{}{}##### None of the test cases errored out. Good! #####{}\n".format(Style.BRIGHT, Fore.GREEN, Style.RESET_ALL))
 
     for part in result.keys():
         result[part]["partial_mark"] = parts_weights[part] * result[part]["correct"] / (result[part]["correct"] + result[part]["to_manually_review"])
