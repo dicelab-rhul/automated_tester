@@ -5,7 +5,7 @@ from sys import exit, stdout
 from os import walk, listdir, rename
 from os.path import exists, isdir, isfile, join, basename
 from pwn import process
-from json import load, dumps
+from json import load
 from re import match
 from sys import version_info
 from shutil import which
@@ -15,7 +15,8 @@ from colorama import Fore, Style, init as colorama_init
 
 test_cases_with_errors: list = []
 
-TIMEOUT=50
+#TODO: read the default value from a config file and make it overridable by a command line parameter.
+TIMEOUT=5
 
 
 def main() -> None:
@@ -35,6 +36,7 @@ def main() -> None:
     preprocess_submission(code_directory=args[0])
     result: dict = check_submission(test_cases=test_cases, code_directory=args[0], tests_directory=args[1], parts_weights=parts_weights)
 
+    print_errors(result=result, submission_id=submission_id)
     process_result(result=result, submission_id=submission_id, parts_weights=parts_weights)
 
 
@@ -111,9 +113,9 @@ def preprocess_submission(code_directory: str) -> None:
 
 
 def check_submission(test_cases: list, code_directory: str, tests_directory: str, parts_weights: dict) -> dict:
-    print("\n###################################################")
+    print("\n{}###################################################".format(Style.BRIGHT))
     print("Checking {}".format(code_directory))
-    print("###################################################\n")
+    print("###################################################{}".format(Style.RESET_ALL))
 
     test_result: dict = build_test_result_stub(parts_weights=parts_weights)
 
@@ -144,7 +146,7 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
         cmd: list = build_swipl_command(test_case=test_case, code_directory=code_directory, tests_directory=tests_directory)
         
         print("\n---------------------------------------------------")
-        print("Executing swipl command: {}".format(" ".join(cmd)))
+        print("{}Test:     {}{}{}".format(Style.BRIGHT, Fore.MAGENTA, " ".join(cmd), Style.RESET_ALL))
         print("---------------------------------------------------\n")
         print("---------------------------------------------------")
 
@@ -168,8 +170,9 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
                 output = str(p.recv(timeout=TIMEOUT), "utf-8")
 
             if "ERROR:" in output:
-                if test_case not in test_cases_with_errors:
-                    test_cases_with_errors.append(test_case)
+                errored_out_test_case: dict = build_errored_out_test_case(test_case=test_case, cmd=cmd, query=query)
+                if errored_out_test_case not in test_cases_with_errors:
+                    test_cases_with_errors.append(errored_out_test_case)
 
                 test_result[part]["to_manually_review"] += 1
                 continue
@@ -188,6 +191,16 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
     test_result[part]["to_manually_review"] += to_review
 
     return test_result
+
+
+def build_errored_out_test_case(test_case: dict, cmd: list, query: str) -> dict:
+    return {
+        "cmd": " ".join(cmd),
+        "queries": {
+            query: list(filter(lambda k: k == query, test_case["queries"].keys()))[0]
+        },
+        "part": test_case["part"]
+    }
 
 
 def build_swipl_command(test_case: dict, code_directory: str, tests_directory: str) -> list:
@@ -215,8 +228,10 @@ def missing_files(code_directory: str, cmd: list, queries: list) -> bool:
             continue
         if not exists(f) or not isfile(f):
             for query in queries:
-                print("'{}', query: '{}' --> OK ? False".format(cmd, query))
-                print("The submission is missing {}".format(basename(f)))
+                print("{}T-case:   {}{}{}".format(Style.BRIGHT, Fore.BLUE, " ".join(cmd), Style.RESET_ALL))
+                print("{}Query:    {}{}{}".format(Style.BRIGHT, Fore.BLUE, query, Style.RESET_ALL))
+                print("{}Passed?   {}{}{}".format(Style.BRIGHT, Fore.RED, False, Style.RESET_ALL))
+                print("{}Reason:   {}The submission is missing {}{}".format(Style.BRIGHT, Fore.RED, basename(f), Style.RESET_ALL))
                 print("---------------------------------------------------")
             return True
 
@@ -266,18 +281,52 @@ def can_match(unordered: str, ordered: str) -> bool:
     return True
 
 
-def process_result(result: dict, submission_id: str, parts_weights: dict) -> None:
+def print_errors(result: dict, submission_id: str) -> None:
     if len(test_cases_with_errors) > 0:
         print("\n{}{}##### The following test cases for submission {} errored out. Some marks may be still awarded after a manual review. #####{}\n".format(Style.BRIGHT, Fore.RED, submission_id, Style.RESET_ALL))
-        print(dumps(obj=test_cases_with_errors, indent=4))
+
+        for test_case in test_cases_with_errors:
+            print("{}Part:     {}{}{}".format(Style.BRIGHT, Fore.YELLOW, test_case["part"], Style.RESET_ALL))
+            print("{}Cmd:      {}{}{}".format(Style.BRIGHT, Fore.YELLOW, test_case["cmd"], Style.RESET_ALL))
+
+            for query in test_case["queries"].keys():
+                print("{}Query:    {}{}{}".format(Style.BRIGHT, Fore.YELLOW, query, Style.RESET_ALL))
+            print()
+
+        print()
     else:
         print("\n{}{}##### None of the test cases errored out. Good! #####{}\n".format(Style.BRIGHT, Fore.GREEN, Style.RESET_ALL))
 
-    for part in result.keys():
-        result[part]["partial_mark"] = parts_weights[part] * result[part]["correct"] / (result[part]["correct"] + result[part]["to_manually_review"])
+    print("---------------------------------------------------\n")
 
-    print("\nResult for {}:\n".format(submission_id))
-    print(dumps(obj=result, indent=4))
+
+def process_result(result: dict, submission_id: str, parts_weights: dict) -> None:
+    for part in result.keys():
+        partial_mark: float = parts_weights[part] * result[part]["correct"] / (result[part]["correct"] + result[part]["to_manually_review"])
+
+        if partial_mark.is_integer():
+            result[part]["partial_mark"] = int(partial_mark)
+        else:
+            result[part]["partial_mark"] = round(partial_mark, 2)
+
+    print("{}{}Results for {}:{}{}\n".format(Style.BRIGHT, Fore.GREEN, submission_id, Style.RESET_ALL, Style.BRIGHT))
+
+    for part, res in result.items():
+        print("{}{}{}:".format(Fore.YELLOW, part, Fore.WHITE))
+
+        for k, v in res.items():
+            if k == "correct":
+                k += " "*11
+                v = "{}{}{}".format(Fore.GREEN, v, Fore.WHITE)
+            elif k == "to_manually_review":
+                v = "{}{}{}".format(Fore.RED, v, Fore.WHITE)
+            elif k == "partial_mark":
+                k += " "*6
+                v = "{}{}{}".format(Fore.BLUE, v, Fore.WHITE)
+                
+            print("    {}: {}".format(k, v))
+        
+    print("\n---------------------------------------------------")
 
 
 if __name__ == "__main__":
