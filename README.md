@@ -1,8 +1,14 @@
+# Support INFO
+
+The system is meant for GNU/Linux and other unix operating systems.
+MS Windows is currently not supported because of the `pwntools` dependency.
+
 # Dependencies
 
-You may need to install the following:
+You may need to install the following (you may have to replace `apt`, depending on your OS):
 
 ```console
+$ sudo apt install python3
 $ sudo apt install swipl
 $ pip3 install pwntools
 ```
