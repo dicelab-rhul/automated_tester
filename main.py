@@ -72,9 +72,37 @@ def check_for_valid_submission(args: list) -> bool:
             print("{} is not a valid directory. Aborting...".format(directory))
             return False
 
+    print_submission_header(code_directory=code_directory)
+
     if not listdir(code_directory):
         print("Empty submission for {}. Not performing any test.".format(basename(code_directory)))
         return False
+
+    for _, _, files in walk(code_directory):
+        for f in files:
+            if is_file_empty_for_all_intents_and_purposes(code_directory=code_directory, f=f):
+                print("{}{}Warning: file {} has no content.{}".format(Style.BRIGHT, Fore.RED, f, Style.RESET_ALL))
+
+    return True
+
+
+def print_submission_header(code_directory: str) -> None:
+    print("\n{}###################################################".format(Style.BRIGHT))
+    print("Checking {}".format(code_directory))
+    print("###################################################{}".format(Style.RESET_ALL))
+
+
+def is_file_empty_for_all_intents_and_purposes(code_directory: str, f: str) -> bool:
+    file_path: str = join(code_directory, f)
+
+    assert exists(file_path) and isfile(file_path)
+
+    with open(file_path, "r") as i_f:
+        lines = [line.strip() for line in i_f.readlines()]
+
+    for line in lines:
+        if len(line) > 0:
+            return False
 
     return True
 
@@ -113,10 +141,6 @@ def preprocess_submission(code_directory: str) -> None:
 
 
 def check_submission(test_cases: list, code_directory: str, tests_directory: str, parts_weights: dict) -> dict:
-    print("\n{}###################################################".format(Style.BRIGHT))
-    print("Checking {}".format(code_directory))
-    print("###################################################{}".format(Style.RESET_ALL))
-
     test_result: dict = build_test_result_stub(parts_weights=parts_weights)
 
     for test_case in test_cases:
