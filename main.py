@@ -14,9 +14,7 @@ from colorama import Fore, Style, init as colorama_init
 
 
 test_cases_with_errors: list = []
-
-#TODO: read the default value from a config file and make it overridable by a command line parameter.
-TIMEOUT=5
+timeout: int = None
 
 
 def main() -> None:
@@ -29,7 +27,15 @@ def main() -> None:
     if not check_for_software_dependencies():
         return
 
-    parts_weights: dict = load_parts_weights(args[3])
+    config: dict = load_config(args[3])
+    parts_weights: dict = config["parts"]
+    global timeout
+
+    if timeout is None:
+        timeout = config["timeout"]
+
+    print("\n{}{}INFO: the timeout for each query is {} seconds.{}".format(Style.BRIGHT, Fore.GREEN, timeout, Style.RESET_ALL))
+
     submission_id: str = basename(args[0])
     test_cases: list = generate_test_cases(test_cases_file=args[2])
 
@@ -45,19 +51,25 @@ def parse_arguments() -> list:
     parser.add_argument("-d", "--code-directory", required=True, metavar="code_directory", type=str, help="The directory which contains the student code.")
     parser.add_argument("-t", "--tests-directory", required=False, metavar="tests_directory", type=str, help="The directory which contains the tests.")
     parser.add_argument("-c", "--test-cases-file", required=True, metavar="test_cases_file", type=str, help="The test cases file.")
-    parser.add_argument("-w", "--weights-file", required=True, metavar="weights_file", type=str, help="The config file with the parts' weights.")
+    parser.add_argument("-C", "--config-file", required=True, metavar="config_file", type=str, help="The config file.")
+    parser.add_argument("-T", "--test-timeout", required=False, metavar="test_timeout", type=int, help="The timeout for each test in seconds.")
 
     args: Namespace = parser.parse_args()
 
     code_directory: str = args.code_directory
     tests_directory: str = args.tests_directory
     test_cases_file: str = args.test_cases_file
-    weights_file: str = args.weights_file
+    config_file: str = args.config_file
+    test_timeout: int = args.test_timeout
 
     if tests_directory is None:
         tests_directory = code_directory
 
-    return [code_directory, tests_directory, test_cases_file, weights_file]
+    if test_timeout is not None:
+        global timeout
+        timeout = test_timeout
+
+    return [code_directory, tests_directory, test_cases_file, config_file]
 
 
 def check_for_valid_submission(args: list) -> bool:
@@ -115,12 +127,12 @@ def check_for_software_dependencies() -> bool:
     return True
 
 
-def load_parts_weights(weights_file: str) -> None:
+def load_config(config_file: str) -> None:
     try:
-        with open(weights_file, "r") as i_f:
+        with open(config_file, "r") as i_f:
             return load(i_f)
     except Exception as e:
-        raise IOError("{} is malformed or not a valid file. Cannot load the parts' weights. Aborting...".format(weights_file)) from e
+        raise IOError("{} is malformed or not a valid file. Cannot load the parts' weights. Aborting...".format(config_file)) from e
 
 
 def generate_test_cases(test_cases_file: str) -> list:
@@ -183,15 +195,15 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
 
         p = process(cmd)
         p.sendline("set_prolog_flag(answer_write_options,[quoted(true), portray(true), spacing(next_argument)]).")
-        p.recv(timeout=TIMEOUT)
+        p.recv(timeout=timeout)
         for query, result in queries.items():
             print("{}T-case:   {}{}{}".format(Style.BRIGHT, Fore.BLUE, " ".join(cmd), Style.RESET_ALL))
             print("{}Query:    {}{}{}".format(Style.BRIGHT, Fore.BLUE, query, Style.RESET_ALL))
             p.sendline(query)
-            output: str = str(p.recv(timeout=TIMEOUT), "utf-8")
+            output: str = str(p.recv(timeout=timeout), "utf-8")
 
             while output.startswith("Welcome to") or output.startswith("Warning") or "true." in output:
-                output = str(p.recv(timeout=TIMEOUT), "utf-8")
+                output = str(p.recv(timeout=timeout), "utf-8")
 
             if "ERROR:" in output:
                 errored_out_test_case: dict = build_errored_out_test_case(test_case=test_case, cmd=cmd, query=query)
