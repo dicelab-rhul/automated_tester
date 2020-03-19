@@ -78,9 +78,9 @@ def check_for_valid_submission(args: list) -> bool:
         print("Empty submission for {}. Not performing any test.".format(basename(code_directory)))
         return False
 
-    for _, _, files in walk(code_directory):
+    for dir, _, files in walk(code_directory):
         for f in files:
-            if is_file_empty_for_all_intents_and_purposes(code_directory=code_directory, f=f):
+            if f.endswith(".pl") and is_file_empty_for_all_intents_and_purposes(dir=dir, f=f):
                 print("{}{}Warning: file {} has no content.{}".format(Style.BRIGHT, Fore.RED, f, Style.RESET_ALL))
 
     return True
@@ -92,8 +92,8 @@ def print_submission_header(code_directory: str) -> None:
     print("###################################################{}".format(Style.RESET_ALL))
 
 
-def is_file_empty_for_all_intents_and_purposes(code_directory: str, f: str) -> bool:
-    file_path: str = join(code_directory, f)
+def is_file_empty_for_all_intents_and_purposes(dir: str, f: str) -> bool:
+    file_path: str = join(dir, f)
 
     assert exists(file_path) and isfile(file_path)
 
