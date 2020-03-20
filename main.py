@@ -147,6 +147,8 @@ def run_queries(cmd: list, test_case: dict, test_result: dict, part: str, querie
         
         print_test_outcome(cmd=cmd, query=query, passed=passed, expected_output=result, actual_output=query_result)
     
+    p.stop()
+
     return correct, to_review
 
 
