@@ -1,6 +1,13 @@
 import os
 
 
+def build_submission_id(candidate: str) -> str:
+    if candidate.endswith("/"):
+        candidate = candidate[:-1]
+
+    return os.path.basename(candidate)
+
+
 def build_test_result_stub(parts_weights: dict) -> dict:
     result: dict = {}
 

@@ -33,7 +33,7 @@ def main() -> None:
 
     print_timeout_info(timeout=timeout)
 
-    submission_id: str = os.path.basename(args[0])
+    submission_id: str = build_submission_id(candidate=args[0])
     test_cases: list = load_json(file_path=args[2])
 
     rename_incorrectly_named_efficient_searches_files(code_directory=args[0])
