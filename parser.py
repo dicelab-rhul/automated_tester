@@ -1,4 +1,9 @@
-from re import match, Match
+from re import match, sre_compile
+
+try:
+    from re import Match
+except:
+    Match = type(sre_compile.compile('', 0).match(''))
 
 
 class PrologOutputParser():
