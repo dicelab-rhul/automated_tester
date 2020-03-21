@@ -84,7 +84,15 @@ def print_test_outcome(cmd: list, query: str, passed: bool, expected_output: str
     print("{}Got:           {}{}{}".format(Style.BRIGHT, output_color, actual_output, Style.RESET_ALL))
     print("{}Order matters? {}{}{}".format(Style.BRIGHT, Fore.YELLOW, order, Style.RESET_ALL))
     print("{}Passed?        {}{}{}".format(Style.BRIGHT, passed_color, passed, Style.RESET_ALL))
+
+    print_coincidence_warning_if_necessary(passed=passed, expected_output=expected_output, actual_output=actual_output)
+
     print("---------------------------------------------------")
+
+
+def print_coincidence_warning_if_necessary(passed: bool, expected_output: str, actual_output: str) -> None:
+    if passed and expected_output == "Res = []." and actual_output == expected_output:
+        print("{}INFO:          {}Check that this correct result is not a coincidence.{}".format(Style.BRIGHT, Fore.YELLOW, Style.RESET_ALL))
 
 
 def print_test_outcome_if_missing_files(cmd: list, queries: list, missing_files: list) -> bool:
