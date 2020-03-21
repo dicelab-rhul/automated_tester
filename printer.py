@@ -118,14 +118,15 @@ def print_final_result(result: dict, submission_id: str, parts_weights: dict) ->
 
         for k, v in res.items():
             if k == "correct":
-                k += " "*11 # TODO: remove this magic number.
+                buffer: str = " "*11 # TODO: remove this magic number.
                 v = "{}{}{}".format(Fore.GREEN, v, Fore.WHITE)
             elif k == "to_manually_review":
+                buffer: str = ""
                 v = "{}{}{}".format(Fore.RED, v, Fore.WHITE)
             elif k == "partial_mark":
-                k += " "*6 # TODO: remove this magic number.
+                buffer: str = " "*6 # TODO: remove this magic number.
                 v = "{}{}{}".format(Fore.BLUE, v, Fore.WHITE)
                 
-            print("    {}: {}".format(k, v))
+            print("    {}:{} {}".format(k, buffer, v))
         
     print("\n---------------------------------------------------")
