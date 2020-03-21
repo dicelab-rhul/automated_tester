@@ -134,7 +134,8 @@ def run_queries(cmd: list, test_case: dict, test_result: dict, part: str, querie
 
         if parser.has_error_message(output=output):
             errored_out_test_case: dict = build_errored_out_test_case(test_case=test_case, cmd=cmd, query=query)
-            test_cases_with_errors.append(errored_out_test_case)                
+            test_cases_with_errors.append(errored_out_test_case)
+            print_test_outcome(cmd=cmd, query=query, passed=False, expected_output=result, actual_output="<aborted due to a syntax error>", order_matters=False) # TODO: check this.
 
             to_review += 1
             continue

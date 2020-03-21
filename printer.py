@@ -73,6 +73,8 @@ def print_test_outcome(cmd: list, query: str, passed: bool, expected_output: str
     if actual_output == "":
         actual_output = "<nothing was returned by the query>"
         output_color = Fore.RED
+    elif actual_output == "<aborted due to a syntax error>":
+        output_color = Fore.RED
     else:
         output_color = Fore.YELLOW
         
