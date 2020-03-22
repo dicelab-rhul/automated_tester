@@ -44,11 +44,12 @@ def print_test_cases_with_errors(test_cases_with_errors: list, submission_id: st
         print("\n{}{}##### The following test cases for submission {} errored out. Some marks may be still awarded after a manual review. #####{}\n".format(Style.BRIGHT, Fore.RED, submission_id, Style.RESET_ALL))
 
         for test_case in test_cases_with_errors:
-            print("{}Part:     {}{}{}".format(Style.BRIGHT, Fore.YELLOW, test_case["part"], Style.RESET_ALL))
-            print("{}Cmd:      {}{}{}".format(Style.BRIGHT, Fore.YELLOW, test_case["cmd"], Style.RESET_ALL))
+            print("{}Part:     {}{}{}".format(Style.BRIGHT, Fore.MAGENTA, test_case["part"], Style.RESET_ALL))
+            print("{}Cmd:      {}{}{}".format(Style.BRIGHT, Fore.BLUE, test_case["cmd"], Style.RESET_ALL))
 
             for query in test_case["queries"].keys():
                 print("{}Query:    {}{}{}".format(Style.BRIGHT, Fore.YELLOW, query, Style.RESET_ALL))
+            print("{}Reason:   {}{}{}".format(Style.BRIGHT, Fore.RED, test_case["reason"], Style.RESET_ALL))
             print()
 
         print()
@@ -70,10 +71,7 @@ def print_test_outcome(cmd: list, query: str, passed: bool, expected_output: str
     else:
         order = "NO"
 
-    if actual_output == "":
-        actual_output = "<nothing was returned by the query>"
-        output_color = Fore.RED
-    elif actual_output == "<aborted due to a syntax error>":
+    if actual_output.startswith("<") and actual_output.endswith(">"):
         output_color = Fore.RED
     else:
         output_color = Fore.YELLOW
@@ -92,7 +90,7 @@ def print_test_outcome(cmd: list, query: str, passed: bool, expected_output: str
 
 def print_coincidence_warning_if_necessary(passed: bool, expected_output: str, actual_output: str) -> None:
     if passed and expected_output == "Res = []." and actual_output == expected_output:
-        print("{}INFO:          {}Check that this correct result is not a coincidence.{}".format(Style.BRIGHT, Fore.YELLOW, Style.RESET_ALL))
+        print("{}INFO:          {}Check whether this result is correct by coincidence.{}".format(Style.BRIGHT, Fore.YELLOW, Style.RESET_ALL))
 
 
 def print_test_outcome_if_missing_files(cmd: list, queries: list, missing_files: list) -> bool:

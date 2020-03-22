@@ -132,10 +132,11 @@ def run_queries(cmd: list, test_case: dict, test_result: dict, part: str, querie
     for query, result in queries.items():
         output: str = p.send_and_receive(to_send=query, keep_receiving_if_received=["Welcome to", "Warning", "true."])
 
-        if parser.has_error_message(output=output):
-            errored_out_test_case: dict = build_errored_out_test_case(test_case=test_case, cmd=cmd, query=query)
+        if parser.has_error_message(output=output) or output == "":
+            errored_out_test_case: dict = build_errored_out_test_case(test_case=test_case, cmd=cmd, query=query, output=output)
             test_cases_with_errors.append(errored_out_test_case)
-            print_test_outcome(cmd=cmd, query=query, passed=False, expected_output=result, actual_output="<aborted due to a syntax error>", order_matters=False) # TODO: check this.
+            fake_output = build_fake_output_after_error_or_timeout(real_output=output)
+            print_test_outcome(cmd=cmd, query=query, passed=False, expected_output=result, actual_output=fake_output, order_matters=False) # TODO: check this.
 
             to_review += 1
             continue

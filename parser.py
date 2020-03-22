@@ -14,7 +14,7 @@ class PrologOutputParser():
         return output == ""
 
     def has_error_message(self, output: str, error_pattern="ERROR:") -> bool:
-        return match(error_pattern, output)
+        return error_pattern in output
 
     def parse_output(self, output: str) -> str:
         m: Match = match(self.__result_regex, output)

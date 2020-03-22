@@ -33,11 +33,12 @@ class PrologIO():
 
     def __recv_utf8_str(self) -> str:
         output = self.__proc.recv(timeout=self.__timeout)
+        to_return: str = str(output, "utf-8")
 
-        if output is None:
-            return ""
+        if to_return == "":
+            raise TimeoutError()
         else:
-            return str(output, "utf-8")
+            return to_return
     
     def send_and_receive(self, to_send: str, keep_receiving_if_received: list):
         if self.__proc is None:
@@ -59,23 +60,41 @@ class PrologIO():
         return self.__receive_data(keep_receiving_if_received=keep_receiving_if_received)
 
     def __receive_data(self, keep_receiving_if_received: list):
-        self.__receive_and_discard_optional_data(keep_receiving_if_received=keep_receiving_if_received)
+        try:
+            self.__receive_and_discard_optional_data(keep_receiving_if_received=keep_receiving_if_received)
 
-        return self.__recv_utf8_str()
+            return self.__recv_utf8_str()
+        except SyntaxError as e:
+            self.__kill_and_restart_swipl()
+
+            return str(e)
+        except TimeoutError:
+            self.__kill_and_restart_swipl()
+
+            return ""
 
     def __receive_and_discard_optional_data(self, keep_receiving_if_received: list) -> None:
         while True:
-            keep_receiving: bool = False
             tmp = self.__recv_utf8_str()
 
-            for elm in keep_receiving_if_received:
-                if elm in tmp:
-                    keep_receiving = True
-                    break
-
-            if not keep_receiving:
+            if "ERROR:" in tmp:
+                raise SyntaxError(tmp)
+            elif not self.__must_receive_again(data=tmp, keep_receiving_if_received=keep_receiving_if_received):
                 self.__proc.unrecv(tmp)
                 break
 
+    def __must_receive_again(self, data: str, keep_receiving_if_received: list) -> bool:
+        for elm in keep_receiving_if_received:
+            if elm in data:
+                return True
+        
+        return False
+
+
     def __receive_and_discard(self) -> None:
         self.__recv_utf8_str()
+
+
+    def __kill_and_restart_swipl(self) -> None:
+        self.__proc.kill()
+        self.run()

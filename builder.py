@@ -31,14 +31,27 @@ def build_swipl_command(test_case: dict, code_directory: str, tests_directory: s
     return cmd
 
 
-def build_errored_out_test_case(test_case: dict, cmd: list, query: str) -> dict:
+def build_errored_out_test_case(test_case: dict, cmd: list, query: str, output: str) -> dict:
+    if output == "":
+        reason: str = "A timeout occurred, or nothing was returned in response to the query."
+    else:
+        reason: str = "There was an error with the Prolog program."
+
     return {
         "cmd": " ".join(cmd),
         "queries": {
             query: list(filter(lambda k: k == query, test_case["queries"].keys()))[0]
         },
-        "part": test_case["part"]
+        "part": test_case["part"],
+        "reason": reason
     }
+
+
+def build_fake_output_after_error_or_timeout(real_output: str) -> str:
+    if real_output and "ERROR" in real_output:
+        return "<aborted due to a Prolog error>"
+    else:
+        return "<a timeout occurred, or nothing was returned in response to the query>"
 
 
 def build_final_result(result: dict, parts_weights: dict) -> dict:
