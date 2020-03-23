@@ -23,7 +23,9 @@ def build_test_result_stub(parts_weights: dict) -> dict:
 def build_swipl_command(test_case: dict, code_directory: str, tests_directory: str) -> list:
     cmd = test_case["cmd"].split(" ")
     cmd[1] = os.path.join(code_directory, cmd[1])
-    cmd[-1] = os.path.join(tests_directory, cmd[-1])
+
+    if tests_directory is not None:
+        cmd[-1] = os.path.join(tests_directory, cmd[-1])
 
     if len(cmd) == 4:
         cmd[2] = os.path.join(code_directory, cmd[2])

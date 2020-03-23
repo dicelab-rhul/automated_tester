@@ -45,7 +45,7 @@ def main() -> None:
 
 def check_submission_validity(code_directory: str, tests_directory: str) -> None:
     try:
-        validate_submission(code_directory=code_directory, tests_directory=tests_directory)
+        validate_submission(code_directory=code_directory, tests_directory=tests_directory, skip_tests=tests_directory is None)
     except Exception as e:
         print_exception_message(e=e)
         exit(-1)
@@ -74,9 +74,6 @@ def parse_arguments() -> list:
     test_cases_file: str = args.test_cases_file
     config_file: str = args.config_file
     test_timeout: int = args.test_timeout
-
-    if tests_directory is None:
-        tests_directory = code_directory
 
     if test_timeout is not None:
         global timeout

@@ -15,10 +15,12 @@ def list_missing_software(software_list: list) -> list:
     return missing
 
 
-def validate_submission(code_directory: str, tests_directory: str):
-    for directory in [code_directory, tests_directory]:
-        if not os.path.isdir(directory):
-            raise IOError("{} is not a valid directory. Aborting...".format(directory))
+def validate_submission(code_directory: str, tests_directory: str, skip_tests: bool):
+    if not os.path.isdir(code_directory):
+        raise IOError("{} is not a valid directory. Aborting...".format(code_directory))
+
+    if not skip_tests and not os.path.isdir(tests_directory):
+        raise IOError("{} is not a valid directory. Aborting...".format(tests_directory))
 
     if not listdir(code_directory):
         raise IOError("Empty submission for {}. Aborting...".format(os.path.basename(code_directory)))

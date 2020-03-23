@@ -11,4 +11,4 @@ fi
 
 chmod 700 main.py
 
-for dir in $(ls assignment1); do ./main.py -d assignment1/${dir} -t tests -c test_cases.json -C marking_config.json SILENT=1 2>/dev/null; done
+for dir in $(ls assignment1); do ./main.py -d assignment1/${dir} -t tests -c test_cases_ass1.json -C marking_config_ass1.json SILENT=1 2>/dev/null; done
