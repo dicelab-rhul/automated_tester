@@ -9,7 +9,7 @@
         "part": "T1"
     },
     {
-        "cmd": "swipl semnet1.pl",
+        "cmd": "swipl semnet.pl",
         "queries": {
             "findall(X:L, setof(Y, isa(X, Y), L), Res).": "Res = [baseball_player:[man, person], chess_player:[man, person], dave:[chess_player, man, person], gregory:[baseball_player, man, person], man:[person], sara:[person]]."
         },
