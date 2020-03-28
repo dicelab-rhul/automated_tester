@@ -107,12 +107,10 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
 
         if missing_files:
             print_test_outcome_if_missing_files(cmd=cmd, queries=queries, missing_files=missing_files)
-            test_case_with_errors_group: list = build_errored_out_test_case_group(test_case=test_case, cmd=cmd, queries=queries, reason="Missing {}".format(missing_files))
-            
-            for test_case_with_errors in test_case_with_errors_group:
-                test_cases_with_errors.append(test_case_with_errors)
-
+            reason: str = "Missing {}".format(missing_files)
+            save_errored_out_test_cases(test_case=test_case, cmd=cmd, queries=queries, reason=reason)
             test_result[part]["to_manually_review"] += len(queries)
+            
             return test_result
 
         p = PrologIO(cmd=cmd, timeout=timeout)
@@ -124,14 +122,17 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
     except Exception as e:
         print_exception()
         reason: str = "Got exception: {}".format(repr(e))
-        test_case_with_errors_group: list = build_errored_out_test_case_group(test_case=test_case, cmd=cmd, queries=queries, reason=reason)
-        
-        for test_case_with_errors in test_case_with_errors_group:
-            test_cases_with_errors.append(test_case_with_errors)
-
+        save_errored_out_test_cases(test_case=test_case, cmd=cmd, queries=queries, reason=reason)
         test_result[part]["to_manually_review"] += len(test_case["queries"])
 
     return test_result
+
+
+def save_errored_out_test_cases(test_case: dict, cmd: list, queries: list, reason: str) -> None:
+    test_case_with_errors_group: list = build_errored_out_test_case_group(test_case=test_case, cmd=cmd, queries=queries, reason=reason)
+        
+    for test_case_with_errors in test_case_with_errors_group:
+        test_cases_with_errors.append(test_case_with_errors)
 
 
 def run_queries(cmd: list, test_case: dict, test_result: dict, part: str, queries: list, p: PrologIO) -> tuple:
