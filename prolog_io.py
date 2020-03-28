@@ -19,12 +19,16 @@ class PrologIO():
         self.__proc: process = None
         self.__timeout: int = timeout
 
+
+    # This is for a potential concurrent-friendly re-implementation in the future.
+    def start(self) -> None:
+        self.run()
     
     def run(self) -> None:
         try:
             self.__proc = process(self.__cmd)
 
-            # This command tells swipl not to abbreviate the output anymore.
+            # This command tells swipl not to abbreviate its output anymore.
             self.__proc.sendline("set_prolog_flag(answer_write_options,[quoted(true), portray(true), spacing(next_argument)]).")
 
             self.__receive_and_discard()
@@ -103,4 +107,4 @@ class PrologIO():
 
     def __kill_and_restart_swipl(self) -> None:
         self.__proc.kill()
-        self.run()
+        self.start()

@@ -111,7 +111,7 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
             return test_result
 
         p = PrologIO(cmd=cmd, timeout=timeout)
-        p.run()
+        p.start()
 
         correct, to_review = run_queries(cmd=cmd, test_case=test_case, test_result=test_result, part=part, queries=queries, p=p)
         test_result[part]["correct"] += correct

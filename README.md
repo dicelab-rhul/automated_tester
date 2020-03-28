@@ -1,7 +1,7 @@
 # Support INFO
 
-The system is meant for GNU/Linux and other unix operating systems.
-MS Windows is currently not supported because of the `pwntools` dependency.
+Supported: GNU/Linux and other unix Operating Systems.
+MS Windows is currently not supported, because of the `pwntools` dependency.
 
 # Dependencies
 
@@ -15,22 +15,24 @@ $ pip3 install pwntools
 
 # Run the script an all the submissions
 
-Be sure to put the extracted `assignment1` folder (download it from Slack) in the same directory as `main.sh`
+For `assigment 1`: ensure the `assignment1` folder is in the same directory as `main_ass1.sh`.
 
 ```console
-$ chmod 700 main.sh
-$ ./main.sh
+$ chmod 700 main_ass1.sh
+$ ./main_ass1.sh
 ```
 
 For better results, pipe the output into a file.
 
 # Standalone run
 
-To run the tester on a single submission:
+For `assigment 1`: to run the tester on a single submission:
 
 ```console
-$ chmod 700 standalone.sh
-$ ./standalone.sh <path_to_the_submission_code_folder>
+$ chmod 700 standalone_ass1.sh
+$ ./standalone_ass1.sh <path_to_the_submission_code_folder>
 ```
 
 For better results, pipe the output into a file.
+
+For `assigment 2`: follow the procedure for `assignment 1`, changing `standalone_ass1.sh` to `standalone_ass2.sh`.
