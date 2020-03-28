@@ -4,5 +4,6 @@
         "T2": 30,
         "T3": 30
     },
-    "timeout": 5
+    "timeout": 5,
+    "exceptions_debug": false
 }

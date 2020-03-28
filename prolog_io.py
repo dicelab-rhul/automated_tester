@@ -5,7 +5,7 @@ from printer import print_exception
 
 
 class PrologIO():
-    def __init__(self, cmd, timeout: int):
+    def __init__(self, cmd, timeout: int, exceptions_debug: bool):
         if type(cmd) == list:
             self.__cmd = cmd
         elif type(cmd) == str:
@@ -18,6 +18,7 @@ class PrologIO():
 
         self.__proc: process = None
         self.__timeout: int = timeout
+        self.__exceptions_debug: bool = exceptions_debug
 
 
     # This is for a potential concurrent-friendly re-implementation in the future.
@@ -34,7 +35,7 @@ class PrologIO():
             self.__receive_and_discard()
         except Exception:
             # TODO: is this the right/only thing to do?
-            print_exception()
+            print_exception(verbose=self.__exceptions_debug)
 
     def stop(self) -> None:
         self.__proc.kill()
@@ -56,7 +57,7 @@ class PrologIO():
             return self.__send_and_receive(to_send=to_send, keep_receiving_if_received=keep_receiving_if_received, error_patterns=error_patterns)
         except Exception as e:
             # TODO: is this the right/only thing to do?
-            print_exception()
+            print_exception(verbose=self.__exceptions_debug)
             return "ERROR: got {} while running".format(str(e))
 
     def __send_and_receive(self, to_send: str, keep_receiving_if_received: list, error_patterns: list):

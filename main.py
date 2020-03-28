@@ -30,6 +30,7 @@ def main() -> None:
 
     config: dict = load_json(file_path=args[3])
     parts_weights: dict = config["parts"]
+    exceptions_debug: bool = config["exceptions_debug"]
 
     global timeout
 
@@ -38,11 +39,13 @@ def main() -> None:
 
     print_timeout_info(timeout=timeout)
 
-    submission_id: str = build_submission_id(candidate=args[0])
+    code_directory: str = args[0]
+    tests_directory: str = args[1]
+    submission_id: str = build_submission_id(candidate=code_directory)
     test_cases: list = load_json(file_path=args[2])
 
-    rename_incorrectly_named_efficient_searches_files(code_directory=args[0])
-    result: dict = check_submission(test_cases=test_cases, code_directory=args[0], tests_directory=args[1], parts_weights=parts_weights)
+    rename_incorrectly_named_efficient_searches_files(code_directory=code_directory)
+    result: dict = check_submission(test_cases, code_directory, tests_directory, parts_weights, exceptions_debug)
 
     print_test_cases_with_errors(test_cases_with_errors=test_cases_with_errors, submission_id=submission_id)
     print_final_result(result=result, submission_id=submission_id, parts_weights=parts_weights)
@@ -87,20 +90,20 @@ def parse_arguments() -> list:
     return [code_directory, tests_directory, test_cases_file, config_file]
 
 
-def check_submission(test_cases: list, code_directory: str, tests_directory: str, parts_weights: dict) -> dict:
+def check_submission(test_cases: list, code_directory: str, tests_directory: str, parts_weights: dict, exceptions_debug: bool) -> dict:
     test_result: dict = build_test_result_stub(parts_weights=parts_weights)
 
     for test_case in test_cases:
-        test_result = check_test_case(test_case=test_case, test_result=test_result, code_directory=code_directory, tests_directory=tests_directory)
+        test_result = check_test_case(test_case, test_result, code_directory, tests_directory, exceptions_debug)
 
     return test_result
 
 
-def check_test_case(test_case: dict, test_result: dict, code_directory: str, tests_directory: str) -> dict:
+def check_test_case(test_case: dict, test_result: dict, code_directory: str, tests_directory: str, exceptions_debug: bool) -> dict:
     try:
         part: str = test_case["part"]
         has_tests: bool = test_case["has_tests"]
-        cmd: list = build_swipl_command(test_case=test_case, code_directory=code_directory, tests_directory=tests_directory, has_tests=has_tests)
+        cmd: list = build_swipl_command(test_case, code_directory, tests_directory, has_tests)
         
         print_test_case_group(cmd=cmd)
 
@@ -115,14 +118,14 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
             
             return test_result
 
-        p = PrologIO(cmd=cmd, timeout=timeout)
+        p = PrologIO(cmd=cmd, timeout=timeout, exceptions_debug=exceptions_debug)
         p.start()
 
         correct, to_review = run_queries(cmd=cmd, test_case=test_case, test_result=test_result, part=part, queries=queries, p=p)
         test_result[part]["correct"] += correct
         test_result[part]["to_manually_review"] += to_review
     except Exception as e:
-        print_exception()
+        print_exception(verbose=exceptions_debug)
         reason: str = "Got exception: {}".format(repr(e))
         save_errored_out_test_cases(test_case=test_case, cmd=cmd, queries=queries, reason=reason)
         test_result[part]["to_manually_review"] += len(test_case["queries"])

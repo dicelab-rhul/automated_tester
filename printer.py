@@ -22,8 +22,9 @@ def print_submission_header(code_directory: str) -> None:
 def print_timeout_info(timeout: int) -> None:
     print("\n{}{}INFO: the timeout for each query is {} seconds.{}".format(Style.BRIGHT, Fore.GREEN, timeout, Style.RESET_ALL))
 
-def print_exception() -> None:
-    print_exc(file=stdout)
+def print_exception(verbose: bool) -> None:
+    if verbose:
+        print_exc(file=stdout)
 
 def print_exception_message(e: Exception) -> None:
     print("{}{}{}{}".format(Style.BRIGHT, Fore.RED, str(e), Style.RESET_ALL))
