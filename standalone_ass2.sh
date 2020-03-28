@@ -14,4 +14,4 @@ if [ -z "${1}" ]; then
     exit -1
 fi
 
-./main.py -d ${1} -c test_cases_ass2.json -C marking_config_ass2.json SILENT=1 2>/dev/null
+./main.py -d ${1} -t tests2 -c test_cases_ass2.json -C marking_config_ass2.json SILENT=1 2>/dev/null

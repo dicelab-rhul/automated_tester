@@ -1,26 +1,36 @@
 [
     {
-        "cmd": "swipl students.pl",
+        "cmd": "swipl students.pl test.pl",
         "queries": {
-            "findall(X, pass(X), Res).": "Res = [].",
+            "findall(X, pass_year(X), Res).": "Res = [bob, mary].",
+            "findall(X, fail(X), Res).": "Res = [pat].",
             "findall(X:E, resit(X, E), Res).": "Res = [tony:e1]."
         },
+        "has_tests": true,
         "order_matters": false,
         "part": "T1"
     },
     {
         "cmd": "swipl semnet.pl",
         "queries": {
+            "findall(X, has_nose(X), Res).": "Res = [gregory, dave, sara].",
+            "findall(X:Y, height_of(X, Y), Res).": "Res = [gregory:195, dave:178, sara:163].",
             "findall(X:L, setof(Y, isa(X, Y), L), Res).": "Res = [baseball_player:[man, person], chess_player:[man, person], dave:[chess_player, man, person], gregory:[baseball_player, man, person], man:[person], sara:[person]]."
         },
+        "has_tests": false,
         "order_matters": false,
         "part": "T2"
     },
     {
         "cmd": "swipl sitcalc.pl",
         "queries": {
+            "findall(X, prolog_book(X), Res).": "Res = [b1].",
+            "findall(X:Y, title(X, Y), Res).": "Res = [b1:'Prolog Primer'].",
+            "findall(X, person(X), Res).": "Res = [mary, bob].",
+            "findall(X, holds(X, s0), Res).": "Res = [lives(mary, uk), lives(bob, uk), has(mary, 10), has(bob, 50), owns(mary, b1), value(b1, 20), happy(mary)].",
             "findall(X, holds(X, do(sell(mary, b1, bob, 20), s0)), Res).": "Res = [lives(mary, uk), lives(bob, uk), owns(bob, b1), has(bob, 30), has(mary, 30), value(b1, 16.0), happy(bob)]."
         },
+        "has_tests": false,
         "order_matters": false,
         "part": "T3"
     }

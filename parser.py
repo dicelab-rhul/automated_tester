@@ -22,7 +22,7 @@ class PrologOutputParser():
         if m:
             return m[0]
         else:
-            return ""
+            return output
 
     def check_output(self, result: str, expected_result: str, out_of_order_allowed: bool=True) -> bool:
         if not result:

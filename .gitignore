@@ -11,5 +11,4 @@ __pycache__/**
 output*
 run_output.txt
 snippets
-tests2
 *.pdf

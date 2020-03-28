@@ -94,7 +94,8 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
 def check_test_case(test_case: dict, test_result: dict, code_directory: str, tests_directory: str) -> dict:
     try:
         part: str = test_case["part"]
-        cmd: list = build_swipl_command(test_case=test_case, code_directory=code_directory, tests_directory=tests_directory)
+        has_tests: bool = test_case["has_tests"]
+        cmd: list = build_swipl_command(test_case=test_case, code_directory=code_directory, tests_directory=tests_directory, has_tests=has_tests)
         
         print_test_case_group(cmd=cmd)
 
