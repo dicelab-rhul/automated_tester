@@ -28,6 +28,7 @@ def main() -> None:
 
     config: dict = load_json(file_path=args[3])
     parts_weights: dict = config["parts"]
+
     global timeout
 
     if timeout is None:
@@ -103,10 +104,14 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
 
         queries: dict = test_case["queries"]
         missing_files: list = list_missing_files(cmd=cmd, directory=code_directory, test_files_excluded=True)
-        
+
         if missing_files:
-            print_test_outcome_if_missing_files(cmd=cmd, missing_files=missing_files)
-            test_cases_with_errors.append(test_case)
+            print_test_outcome_if_missing_files(cmd=cmd, queries=queries, missing_files=missing_files)
+            test_case_with_errors_group: list = build_errored_out_test_case_group(test_case=test_case, cmd=cmd, queries=queries, reason="Missing {}".format(missing_files))
+            
+            for test_case_with_errors in test_case_with_errors_group:
+                test_cases_with_errors.append(test_case_with_errors)
+
             test_result[part]["to_manually_review"] += len(queries)
             return test_result
 
@@ -116,9 +121,14 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
         correct, to_review = run_queries(cmd=cmd, test_case=test_case, test_result=test_result, part=part, queries=queries, p=p)
         test_result[part]["correct"] += correct
         test_result[part]["to_manually_review"] += to_review
-    except Exception:
+    except Exception as e:
         print_exception()
-        test_cases_with_errors.append(test_case)
+        reason: str = "Got exception: {}".format(repr(e))
+        test_case_with_errors_group: list = build_errored_out_test_case_group(test_case=test_case, cmd=cmd, queries=queries, reason=reason)
+        
+        for test_case_with_errors in test_case_with_errors_group:
+            test_cases_with_errors.append(test_case_with_errors)
+
         test_result[part]["to_manually_review"] += len(test_case["queries"])
 
     return test_result

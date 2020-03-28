@@ -52,14 +52,14 @@ def is_file_empty_for_all_intents_and_purposes(dir: str, f: str) -> bool:
 
 def list_missing_files(cmd: list, directory: str, test_files_excluded: bool=True) -> list:
     missing_files: list = []
-    file_list: list = [os.path.join(directory, f) for f in filter(lambda f: f.endswith(".pl"), cmd)]
+    file_list: list = [f for f in filter(lambda f: f.endswith(".pl"), cmd)]
 
     for f in file_list:
         name: str = os.path.basename(f)
         if test_files_excluded and name.startswith("test"):
             continue
         elif not os.path.isfile(f):
-            return missing_files.append(name)
+            missing_files.append(name)
 
     return missing_files
 

@@ -35,9 +35,15 @@ def build_swipl_command(test_case: dict, code_directory: str, tests_directory: s
     return cmd
 
 
+def build_errored_out_test_case_group(test_case: dict, cmd: list=["Unknown"], queries: list=[], reason: str="Unknown") -> list:
+    return [build_errored_out_test_case(test_case=test_case, cmd=cmd, query=query, output=reason) for query in queries]
+
+
 def build_errored_out_test_case(test_case: dict, cmd: list, query: str, output: str) -> dict:
     if output == "":
         reason: str = "A timeout occurred, or nothing was returned in response to the query."
+    elif "Missing" in output or "Got exception: " in output:
+        reason: str = output
     else:
         reason: str = "There was an error with the Prolog program."
 

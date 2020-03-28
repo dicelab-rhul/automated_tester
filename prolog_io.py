@@ -57,7 +57,7 @@ class PrologIO():
         except Exception as e:
             # TODO: is this the right/only thing to do?
             print_exception()
-            return "Got {} while running".format(e)
+            return "ERROR: got {} while running".format(str(e))
 
     def __send_and_receive(self, to_send: str, keep_receiving_if_received: list, error_patterns: list):
         if to_send.endswith("\n"):

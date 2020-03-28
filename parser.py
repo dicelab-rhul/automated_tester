@@ -39,6 +39,8 @@ class PrologOutputParser():
         return outcome
 
     def __ordered_match(self, unordered: str, ordered: str) -> bool:
+        print(ordered)
+        print(unordered)
         assert match(self.__result_regex, unordered) and match(self.__result_regex, ordered)
 
         # Same number of characters.

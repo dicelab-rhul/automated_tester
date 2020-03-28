@@ -24,6 +24,8 @@ $ ./main_ass1.sh
 
 For better results, pipe the output into a file.
 
+For `assigment 2`: follow the procedure for `assignment 1`, changing `main_ass1.sh` to `main_ass2.sh`, and `assignment1` to `assignment2`.
+
 # Standalone run
 
 For `assigment 1`: to run the tester on a single submission:
