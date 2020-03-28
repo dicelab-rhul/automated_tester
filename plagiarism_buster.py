@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+__author__ = "cloudstrife9999"
 
 from os import walk
 from os.path import basename, join

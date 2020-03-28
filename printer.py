@@ -1,3 +1,5 @@
+__author__ = "cloudstrife9999"
+
 from json import dumps
 from colorama import Fore, Style
 from builder import build_final_result

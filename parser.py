@@ -1,3 +1,5 @@
+__author__ = "cloudstrife9999"
+
 from re import match, sre_compile
 
 try:

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+__author__ = "cloudstrife9999"
+
 from argparse import ArgumentParser, Namespace
 from sys import exit
 from colorama import init as colorama_init
