@@ -100,14 +100,18 @@ def check_submission(test_cases: list, code_directory: str, tests_directory: str
 
 
 def check_test_case(test_case: dict, test_result: dict, code_directory: str, tests_directory: str, exceptions_debug: bool) -> dict:
-    try:
-        part: str = test_case["part"]
-        has_tests: bool = test_case["has_tests"]
-        cmd: list = build_swipl_command(test_case, code_directory, tests_directory, has_tests)
-        
-        print_test_case_group(cmd=cmd)
+    part: str = test_case["part"]
+    has_tests: bool = test_case["has_tests"]
+    cmd: list = build_swipl_command(test_case, code_directory, tests_directory, has_tests)
+    queries: dict = test_case["queries"]
 
-        queries: dict = test_case["queries"]
+    print_test_case_group(cmd=cmd)
+    
+    return do_check_test_case(test_case, cmd, part, queries, test_result, code_directory, exceptions_debug)
+
+
+def do_check_test_case(test_case: dict, cmd: list, part: str, queries: list, test_result: dict, code_directory: str, exceptions_debug: bool) -> dict:
+    try:
         missing_files: list = list_missing_files(cmd=cmd, directory=code_directory, test_files_excluded=True)
 
         if missing_files:
@@ -131,6 +135,7 @@ def check_test_case(test_case: dict, test_result: dict, code_directory: str, tes
         test_result[part]["to_manually_review"] += len(test_case["queries"])
 
     return test_result
+
 
 
 def save_errored_out_test_cases(test_case: dict, cmd: list, queries: list, reason: str) -> None:
