@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This is to test all the submissions in a go.
+# This is to test all the submissions in one go.
 
 SWIPL="swipl"
 
