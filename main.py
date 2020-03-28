@@ -16,6 +16,8 @@ import os
 
 test_cases_with_errors: list = []
 timeout: int = None
+keep_receiving_if_received: str = ["Welcome to", "Warning", "true.", "help(", "?-"]
+error_patterns: list = ["ERROR:", "global-stack", "Searching:"]
 
 
 def main() -> None:
@@ -141,7 +143,7 @@ def run_queries(cmd: list, test_case: dict, test_result: dict, part: str, querie
     to_review: int = 0
 
     for query, result in queries.items():
-        output: str = p.send_and_receive(to_send=query, keep_receiving_if_received=["Welcome to", "Warning", "true."])
+        output: str = p.send_and_receive(to_send=query, keep_receiving_if_received=keep_receiving_if_received, error_patterns=error_patterns)
 
         if parser.has_error_message(output=output) or output == "":
             errored_out_test_case: dict = build_errored_out_test_case(test_case=test_case, cmd=cmd, query=query, output=output)

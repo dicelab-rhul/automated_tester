@@ -11,6 +11,7 @@ except:
 class PrologOutputParser():
     def __init__(self):
         self.__result_regex: str = "Res = \[.*\]\."
+        self.__result_partial_regex: str = "Res = \[.*"
 
     def is_output_empty(self, output: str) -> bool:
         return output == ""
@@ -27,21 +28,22 @@ class PrologOutputParser():
             return output
 
     def check_output(self, result: str, expected_result: str, out_of_order_allowed: bool=True) -> bool:
-        if not result:
+        if not result or not result.strip():
             return False
 
         outcome: bool = result == expected_result
         
         # If order does not matter.
-        if not  outcome and out_of_order_allowed:
+        if not outcome and out_of_order_allowed:
             outcome |= self.__ordered_match(result, expected_result)
 
         return outcome
 
     def __ordered_match(self, unordered: str, ordered: str) -> bool:
-        print(ordered)
-        print(unordered)
-        assert match(self.__result_regex, unordered) and match(self.__result_regex, ordered)
+        assert match(self.__result_regex, ordered)
+
+        if not match(self.__result_regex, unordered):
+            return False
 
         # Same number of characters.
         if len(unordered) != len(ordered):
