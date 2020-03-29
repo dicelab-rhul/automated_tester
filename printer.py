@@ -1,10 +1,10 @@
 __author__ = "cloudstrife9999"
 
-from json import dumps
 from colorama import Fore, Style
 from builder import build_final_result
 from traceback import print_exc
 from sys import stdout
+from common import config, storage
 
 
 def print_missing_software_dependencies(missing: list) -> None:
@@ -13,17 +13,17 @@ def print_missing_software_dependencies(missing: list) -> None:
         print("{}{}Aborting...{}".format(Style.BRIGHT, Fore.RED, Style.RESET_ALL))
 
 
-def print_submission_header(code_directory: str) -> None:
+def print_submission_header() -> None:
     print("\n{}###################################################".format(Style.BRIGHT))
-    print("Checking {}".format(code_directory))
+    print("Checking {}".format(config["code_directory"]))
     print("###################################################{}".format(Style.RESET_ALL))
 
 
-def print_timeout_info(timeout: int) -> None:
-    print("\n{}{}INFO: the timeout for each query is {} seconds.{}".format(Style.BRIGHT, Fore.GREEN, timeout, Style.RESET_ALL))
+def print_timeout_info() -> None:
+    print("\n{}{}INFO: the timeout for each query is {} seconds.{}".format(Style.BRIGHT, Fore.GREEN, config["timeout"], Style.RESET_ALL))
 
-def print_exception(verbose: bool) -> None:
-    if verbose:
+def print_exception_maybe() -> None:
+    if config["exceptions_debug"]:
         print_exc(file=stdout)
 
 def print_exception_message(e: Exception) -> None:
@@ -42,7 +42,9 @@ def print_test_case_group(cmd: list) -> None:
     print("---------------------------------------------------")
 
 
-def print_test_cases_with_errors(test_cases_with_errors: list, submission_id: str) -> None:
+def print_test_cases_with_errors(submission_id: str) -> None:
+    test_cases_with_errors: list = storage["test_cases_with_errors"]
+
     if len(test_cases_with_errors) > 0:
         print("\n{}{}##### The following test cases for submission {} errored out. Some marks may be still awarded after a manual review. #####{}\n".format(Style.BRIGHT, Fore.RED, submission_id, Style.RESET_ALL))
 
@@ -105,27 +107,24 @@ def print_test_outcome_if_missing_files(cmd: list, queries: list, missing_files:
         print("---------------------------------------------------")
 
 
-def print_json(src: dict, indent=4) -> None:
-    print(dumps(obj=src, indent=indent))
-
-
-def print_final_result(result: dict, submission_id: str, parts_weights: dict) -> None:
-    result = build_final_result(result=result, parts_weights=parts_weights)
+def print_final_result(result: dict, submission_id: str) -> None:
+    result = build_final_result(result=result)
 
     print("{}{}Results for {}:{}{}\n".format(Style.BRIGHT, Fore.GREEN, submission_id, Style.RESET_ALL, Style.BRIGHT))
 
     for part, res in result.items():
         print("{}{}{}:".format(Fore.YELLOW, part, Fore.WHITE))
 
+        longest_key_length: int = max(map(len, res))
+
         for k, v in res.items():
+            buffer: str = " " * (longest_key_length - len(k))
+
             if k == "correct":
-                buffer: str = " "*11 # TODO: remove this magic number.
                 v = "{}{}{}".format(Fore.GREEN, v, Fore.WHITE)
             elif k == "to_manually_review":
-                buffer: str = ""
                 v = "{}{}{}".format(Fore.RED, v, Fore.WHITE)
             elif k == "partial_mark":
-                buffer: str = " "*6 # TODO: remove this magic number.
                 v = "{}{}{}".format(Fore.BLUE, v, Fore.WHITE)
                 
             print("    {}:{} {}".format(k, buffer, v))

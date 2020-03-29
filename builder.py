@@ -1,5 +1,7 @@
 __author__ = "cloudstrife9999"
 
+from common import config
+
 import os
 
 
@@ -10,10 +12,10 @@ def build_submission_id(candidate: str) -> str:
     return os.path.basename(candidate)
 
 
-def build_test_result_stub(parts_weights: dict) -> dict:
+def build_test_result_stub() -> dict:
     result: dict = {}
 
-    for part in parts_weights.keys():
+    for part in config["parts_weights"].keys():
         result[part] = {
             "correct": 0,
             "to_manually_review": 0
@@ -22,7 +24,9 @@ def build_test_result_stub(parts_weights: dict) -> dict:
     return result
 
 
-def build_swipl_command(test_case: dict, code_directory: str, tests_directory: str, has_tests: bool) -> list:
+def build_swipl_command(test_case: dict, has_tests: bool) -> list:
+    code_directory: str = config["code_directory"]
+    tests_directory: str = config["tests_directory"]
     cmd = test_case["cmd"].split(" ")
     cmd[1] = os.path.join(code_directory, cmd[1])
 
@@ -64,7 +68,9 @@ def build_fake_output_after_error_or_timeout(real_output: str) -> str:
         return "<a timeout occurred, or nothing was returned in response to the query>"
 
 
-def build_final_result(result: dict, parts_weights: dict) -> dict:
+def build_final_result(result: dict) -> dict:
+    parts_weights: dict = config["parts_weights"]
+
     for part in result.keys():
         partial_mark: float = parts_weights[part] * result[part]["correct"] / (result[part]["correct"] + result[part]["to_manually_review"])
 

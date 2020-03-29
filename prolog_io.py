@@ -1,11 +1,12 @@
 __author__ = "cloudstrife9999"
 
 from pwn import process
-from printer import print_exception
+from printer import print_exception_maybe
+from common import config
 
 
 class PrologIO():
-    def __init__(self, cmd, timeout: int, exceptions_debug: bool):
+    def __init__(self, cmd):
         if type(cmd) == list:
             self.__cmd = cmd
         elif type(cmd) == str:
@@ -13,13 +14,16 @@ class PrologIO():
         else:
             raise ValueError("Unsupported command type: {}".format(type(cmd)))
 
+        self.__proc: process = None
+        self.__timeout: int = self.__validate_timeout()
+
+    def __validate_timeout(self) -> int:
+        timeout: int = config["timeout"]
+
         if type(timeout) != int or timeout < 0:
             raise ValueError("{} is not a valid timeout value.")
-
-        self.__proc: process = None
-        self.__timeout: int = timeout
-        self.__exceptions_debug: bool = exceptions_debug
-
+        else:
+            return timeout
 
     # This is for a potential concurrent-friendly re-implementation in the future.
     def start(self) -> None:
@@ -32,10 +36,10 @@ class PrologIO():
             # This command tells swipl not to abbreviate its output anymore.
             self.__proc.sendline("set_prolog_flag(answer_write_options,[quoted(true), portray(true), spacing(next_argument)]).")
 
+            # We always want to discard the swipl header message.
             self.__receive_and_discard()
         except Exception:
-            # TODO: is this the right/only thing to do?
-            print_exception(verbose=self.__exceptions_debug)
+            print_exception_maybe()
 
     def stop(self) -> None:
         self.__proc.kill()
@@ -49,28 +53,27 @@ class PrologIO():
         else:
             return to_return
     
-    def send_and_receive(self, to_send: str, keep_receiving_if_received: list, error_patterns: list=["ERROR:"]):
+    def send_and_receive(self, to_send: str):
         if self.__proc is None:
             raise ValueError("The process has not been initialised yet.")
 
         try:
-            return self.__send_and_receive(to_send=to_send, keep_receiving_if_received=keep_receiving_if_received, error_patterns=error_patterns)
+            return self.__send_and_receive(to_send=to_send)
         except Exception as e:
-            # TODO: is this the right/only thing to do?
-            print_exception(verbose=self.__exceptions_debug)
+            print_exception_maybe()
             return "ERROR: got {} while running".format(str(e))
 
-    def __send_and_receive(self, to_send: str, keep_receiving_if_received: list, error_patterns: list):
+    def __send_and_receive(self, to_send: str):
         if to_send.endswith("\n"):
             self.__proc.send(to_send)
         else:
             self.__proc.sendline(to_send)
 
-        return self.__receive_data(keep_receiving_if_received=keep_receiving_if_received, error_patterns=error_patterns)
+        return self.__receive_data()
 
-    def __receive_data(self, keep_receiving_if_received: list, error_patterns: list):
+    def __receive_data(self):
         try:
-            self.__receive_and_discard_optional_data(keep_receiving_if_received=keep_receiving_if_received, error_patterns=error_patterns)
+            self.__receive_and_discard_optional_data()
 
             return self.__recv_utf8_str()
         except SyntaxError as e:
@@ -82,25 +85,24 @@ class PrologIO():
 
             return ""
 
-    def __receive_and_discard_optional_data(self, keep_receiving_if_received: list, error_patterns: list) -> None:
+    def __receive_and_discard_optional_data(self) -> None:
         while True:
             tmp = self.__recv_utf8_str()
 
-            for error_pattern in error_patterns:
+            for error_pattern in config["error_patterns"]:
                 if error_pattern in tmp:
                     raise SyntaxError(tmp)
             
-            if not self.__must_receive_again(data=tmp, keep_receiving_if_received=keep_receiving_if_received):
+            if not self.__must_receive_again(data=tmp):
                 self.__proc.unrecv(tmp)
                 break
 
-    def __must_receive_again(self, data: str, keep_receiving_if_received: list) -> bool:
-        for elm in keep_receiving_if_received:
+    def __must_receive_again(self, data: str) -> bool:
+        for elm in config["keep_receiving_if_received"]:
             if elm in data:
                 return True
         
         return False
-
 
     def __receive_and_discard(self) -> None:
         self.__recv_utf8_str()

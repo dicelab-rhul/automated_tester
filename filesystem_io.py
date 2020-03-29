@@ -5,23 +5,27 @@ import os
 from os import walk, rename, listdir
 from shutil import which
 from json import load
+from common import config
 
 
-def list_missing_software(software_list: list) -> list:
+def list_missing_software() -> list:
     missing: list = []
 
-    for software in software_list:
+    for software in config["required_software"]:
         if which(software) is None:
             missing.append(software)
 
     return missing
 
 
-def validate_submission(code_directory: str, tests_directory: str, skip_tests: bool):
+def validate_submission():
+    code_directory = config["code_directory"]
+    tests_directory = config["tests_directory"]
+
     if not os.path.isdir(code_directory):
         raise IOError("{} is not a valid directory. Aborting...".format(code_directory))
 
-    if not skip_tests and not os.path.isdir(tests_directory):
+    if tests_directory is not None and not os.path.isdir(tests_directory):
         raise IOError("{} is not a valid directory. Aborting...".format(tests_directory))
 
     if not listdir(code_directory):
@@ -50,7 +54,7 @@ def is_file_empty_for_all_intents_and_purposes(dir: str, f: str) -> bool:
     return True
 
 
-def list_missing_files(cmd: list, directory: str, test_files_excluded: bool=True) -> list:
+def list_missing_files(cmd: list, test_files_excluded: bool=True) -> list:
     missing_files: list = []
     file_list: list = [f for f in filter(lambda f: f.endswith(".pl"), cmd)]
 
@@ -64,8 +68,8 @@ def list_missing_files(cmd: list, directory: str, test_files_excluded: bool=True
     return missing_files
 
 
-def rename_incorrectly_named_efficient_searches_files(code_directory: str) -> None:
-    for f in yield_all_files_in_directory(code_directory): # Maybe in the future we'll be less lenient with this kind of "errors".
+def rename_incorrectly_named_efficient_searches_files() -> None:
+    for f in yield_all_files_in_directory(config["code_directory"]): # Maybe in the future we'll be less lenient with this kind of "errors".
         if os.path.basename(f) == "efficient_search.pl":
             new_name: str = "efficient_searches.pl"
             rename(f, os.path.join(os.path.dirname(f), new_name))

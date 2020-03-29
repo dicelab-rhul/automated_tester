@@ -5,6 +5,7 @@
             "findall(X, search([[a]], X), Res).": "Res = [[a, f, i]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T1(a)"
     },
     {
@@ -13,6 +14,7 @@
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, d], [a, f, i], [a, f, i, j, m]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T1(a)"
     },
     {
@@ -21,6 +23,7 @@
             "findall(X, search([[a]], X), Res).": "Res = [[a, f, i]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T1(b)"
     },
     {
@@ -29,6 +32,7 @@
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, d], [a, f, i], [a, f, i, j, m]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T1(b)"
     },
     {
@@ -37,6 +41,7 @@
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, d], [a, f, i], [a, f, i, j, m]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T1(c)"
     },
     {
@@ -45,6 +50,7 @@
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, g], [a, e, h], [a, e, i, k], [a, b, g, e, h], [a, b, g, e, i, k]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T1(c)"
     },
     {
@@ -53,6 +59,7 @@
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, d], [a, f, i], [a, f, i, j, m]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T1(c)"
     },
     {
@@ -61,6 +68,7 @@
             "findall(X, search([[a]], X), Res).": "Res = [[a, b, g], [a, b, g, e, h], [a, b, g, e, i, k], [a, e, h], [a, e, i, k]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T1(c)"
     },
     {
@@ -75,6 +83,7 @@
             "findall(X, ids([a], 1, 3, X), Res).": "Res = [[a, f, i], [a, f, i]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T2(a)"
     },
     {
@@ -91,6 +100,7 @@
             "findall(X, ids([a], 1, 4, X), Res).": "Res = [[a, b, d], [a, f, i], [a, b, d], [a, f, i], [a, b, d], [a, f, i], [a, f, i, j, m]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T2(b)"
     },
     {
@@ -107,6 +117,7 @@
             "findall(X, ids([a], 1, 4, X), Res).": "Res = [[a, b, d], [a, f, i], [a, b, d], [a, f, i], [a, b, d], [a, f, i], [a, f, i, j, m]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T2(c)"
     },
     {
@@ -126,6 +137,7 @@
             "findall(X, ids([a], 1, 5, X), Res).": "Res = [[a, b, g], [a, e, h], [a, b, g], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, e, h], [a, e, i, k], [a, b, g], [a, b, g, e, h], [a, b, g, e, i, k], [a, e, h], [a, e, i, k]]."
         },
         "has_tests": true,
+        "order_matters": false,
         "part": "T2(d)"
     }
 ]
