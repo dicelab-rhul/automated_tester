@@ -1,3 +1,11 @@
+# DISCLAIMER
+
+- To any student stumbling upon this repo (good job BTW, it means you are just curious enough): nothing in here will replace the effort you need to put into the coursework. Not even the unpublished query results (which are not revealing BTW).
+
+- The authors are not liable, if you copy-paste something from this repo into your code, and then fail the coursework.
+
+- Certain relevant files are not shared on this repo.
+
 # Support INFO
 
 Supported: GNU/Linux and other unix Operating Systems.
