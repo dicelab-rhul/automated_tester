@@ -35,8 +35,8 @@ def validate_submission():
 def list_empty_files(code_directory: str) -> list:
     empty: list = []
 
-    for f in yield_all_files_in_directory(directory=code_directory):
-        if f.endswith(".pl") and is_file_empty_for_all_intents_and_purposes(dir=dir, f=f):
+    for f in yield_all_useful_files_in_directory(directory=code_directory):
+        if is_file_empty_for_all_intents_and_purposes(dir=dir, f=f):
             empty.append(os.path.basename(f))
 
 
@@ -68,26 +68,44 @@ def list_missing_files(cmd: list, test_files_excluded: bool=True) -> list:
     return missing_files
 
 
+# Maybe in the future we'll be less lenient with this kind of "errors".
 def rename_incorrectly_named_efficient_searches_files() -> None:
-    for f in yield_all_files_in_directory(config["code_directory"]): # Maybe in the future we'll be less lenient with this kind of "errors".
-        if os.path.basename(f) == "efficient_search.pl":
-            new_name: str = "efficient_searches.pl"
-            rename(f, os.path.join(os.path.dirname(f), new_name))
-            break
+    for f in yield_all_useful_files_in_directory(config["code_directory"]):
+        possibly_incorrect_name: str = os.path.basename(f)
+
+        if possibly_incorrect_name in config["common_misspellings"].keys():
+            correct_name: str = config["common_misspellings"][possibly_incorrect_name]
+            rename(f, os.path.join(os.path.dirname(f), correct_name))
 
 
-def load_lines(file_path: str) -> list:
+def load_lines(file_path: str, min_len: int=1) -> list:
     _check_file(file_path=file_path)
 
     try:
         with open(file_path, "r") as f:
-            return f.readlines()
+            return [line for line in f.readlines() if len(line) > min_len]
     except Exception as e:
         raise IOError("There was an error while accessing or reading {}".format(file_path)) from e
 
 
-def load_stripped_lines(file_path: str) -> list:
-    return [line.strip() for line in load_lines(file_path=file_path)]
+def load_stripped_lines(file_path: str, min_len: int=1) -> list:
+    return [line.strip() for line in load_lines(file_path=file_path, min_len=min_len)]
+
+
+def load_lines_without_trailing_newlines(file_path: str, min_len: int=1) -> list:
+    to_return: list = []
+    newlines: list = ["\n", "\r"]
+
+    lines: list = load_lines(file_path=file_path, min_len=min_len)
+
+    for line in lines:
+        while len(line) > 0 and line[-1] in newlines:
+            line = line[:-1]
+
+        if len(line) > 0:
+            to_return.append(line)
+
+    return to_return
 
 
 def load_json(file_path: str) -> dict:
@@ -107,7 +125,13 @@ def _check_file(file_path: str) -> None:
         raise ValueError("{} is not a valid file.".format(file_path))
 
 
-def yield_all_files_in_directory(directory: str) -> iter:
+def yield_all_useful_files_in_directory(directory: str, extensions:list=None) -> iter:
+    if extensions is None:
+        extensions = config["notable_extensions"]
+
     for dir, _, files in walk(directory):
         for f in files:
-            yield os.path.join(dir, f)
+            for extension in extensions:
+                if f.endswith(extension):
+                    yield os.path.join(dir, f)
+                    break

@@ -2,6 +2,11 @@ config: dict = {
     "required_software": [
         "swipl"
     ],
+    "notable_extensions": [".pl"],
+    "common_misspellings": {
+        "breath_first.pl": "breadth_first.pl",
+        "efficient_search.pl": "efficient_searches.pl"
+    },
     "parts_weights": {},
     "timeout": None,
     "code_directory": "",

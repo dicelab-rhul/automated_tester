@@ -5,6 +5,7 @@ from builder import build_final_result
 from traceback import print_exc
 from sys import stdout
 from common import config, storage
+from json import dumps
 
 
 def print_missing_software_dependencies(missing: list) -> None:
@@ -130,3 +131,7 @@ def print_final_result(result: dict, submission_id: str) -> None:
             print("    {}:{} {}".format(k, buffer, v))
         
     print("\n---------------------------------------------------")
+
+
+def print_json(to_print: dict, indend=4, sort_keys=False) -> None:
+    print(dumps(obj=to_print, indent=indend, sort_keys=sort_keys))
