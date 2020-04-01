@@ -5,13 +5,14 @@ import os
 from os import walk, rename, listdir
 from shutil import which
 from json import load
-from common import config
+from common import global_config
+from strings import *
 
 
 def list_missing_software() -> list:
     missing: list = []
 
-    for software in config["required_software"]:
+    for software in global_config[required_software_key]:
         if which(software) is None:
             missing.append(software)
 
@@ -19,8 +20,8 @@ def list_missing_software() -> list:
 
 
 def validate_submission():
-    code_directory = config["code_directory"]
-    tests_directory = config["tests_directory"]
+    code_directory = global_config[code_directory_key]
+    tests_directory = global_config[tests_directory_key]
 
     if not os.path.isdir(code_directory):
         raise IOError("{} is not a valid directory. Aborting...".format(code_directory))
@@ -56,11 +57,11 @@ def is_file_empty_for_all_intents_and_purposes(dir: str, f: str) -> bool:
 
 def list_missing_files(cmd: list, test_files_excluded: bool=True) -> list:
     missing_files: list = []
-    file_list: list = [f for f in filter(lambda f: f.endswith(".pl"), cmd)]
+    file_list: list = __get_relevant_file_names_from_cmd(cmd=cmd)
 
     for f in file_list:
         name: str = os.path.basename(f)
-        if test_files_excluded and name.startswith("test"):
+        if test_files_excluded and name.startswith(test_prefix):
             continue
         elif not os.path.isfile(f):
             missing_files.append(name)
@@ -68,13 +69,31 @@ def list_missing_files(cmd: list, test_files_excluded: bool=True) -> list:
     return missing_files
 
 
+def __get_relevant_file_names_from_cmd(cmd: list) -> list:
+    relevant_files: list = []
+
+    for elm in cmd:
+        if not "." in elm:
+            continue
+        
+        tokens: list = elm.split(".")
+
+        # This is safe, as we already checked for the presence of "." within elm.
+        extension: str = "." + tokens[-1]
+
+        if tokens[-2] != "" and extension in global_config[notable_extensions_key]:
+            relevant_files.append(elm)
+
+    return relevant_files
+
+
 # Maybe in the future we'll be less lenient with this kind of "errors".
 def rename_incorrectly_named_efficient_searches_files() -> None:
-    for f in yield_all_useful_files_in_directory(config["code_directory"]):
+    for f in yield_all_useful_files_in_directory(global_config[code_directory_key]):
         possibly_incorrect_name: str = os.path.basename(f)
 
-        if possibly_incorrect_name in config["common_misspellings"].keys():
-            correct_name: str = config["common_misspellings"][possibly_incorrect_name]
+        if possibly_incorrect_name in global_config[common_misspellings_key].keys():
+            correct_name: str = global_config[common_misspellings_key][possibly_incorrect_name]
             rename(f, os.path.join(os.path.dirname(f), correct_name))
 
 
@@ -121,13 +140,15 @@ def load_json(file_path: str) -> dict:
 def _check_file(file_path: str) -> None:
     if file_path is None:
         raise ValueError("A file path cannot be None.")
-    elif not os.path.isfile(file_path): # Symlinks are not supported.
-        raise ValueError("{} is not a valid file.".format(file_path))
+    elif os.path.isdir(file_path):
+        raise ValueError("{} is an existing directory, not a regular file or symlink.".format(file_path))
+    elif not os.path.isfile(file_path) and not os.path.islink(file_path):
+        raise ValueError("{} is not a valid regular file or symlink.".format(file_path))
 
 
 def yield_all_useful_files_in_directory(directory: str, extensions:list=None) -> iter:
     if extensions is None:
-        extensions = config["notable_extensions"]
+        extensions = global_config[notable_extensions_key]
 
     for dir, _, files in walk(directory):
         for f in files:

@@ -1,6 +1,8 @@
 __author__ = "cloudstrife9999"
 
 from re import match, sre_compile
+from common import global_config
+from strings import *
 
 try:
     from re import Match
@@ -10,14 +12,17 @@ except:
 
 class PrologOutputParser():
     def __init__(self):
-        self.__result_regex: str = "Res = \[.*\]\."
-        self.__result_partial_regex: str = "Res = \[.*"
+        self.__result_regex: str = "Res = \[.*\]\." #TODO: move this to the config file.
 
     def is_output_empty(self, output: str) -> bool:
         return output == ""
 
-    def has_error_message(self, output: str, error_pattern="ERROR:") -> bool:
-        return error_pattern in output
+    def has_error_message(self, output: str) -> bool:
+        for error_pattern in global_config[error_patterns_key]:
+            if error_pattern in output:
+                return True
+        
+        return False
 
     def parse_output(self, output: str) -> str:
         m: Match = match(self.__result_regex, output)

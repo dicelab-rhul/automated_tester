@@ -6,6 +6,7 @@ from argparse import ArgumentParser, Namespace
 from filesystem_io import load_lines_without_trailing_newlines, yield_all_useful_files_in_directory
 from printer import print_json
 from builder import build_submission_id
+from strings import *
 
 import os
 
@@ -57,8 +58,8 @@ def check_for_pattern(path: str, snippet: list) -> bool:
 
 def main() -> None:
     parser: ArgumentParser = ArgumentParser()
-    parser.add_argument("-d", "--code-directory", required=True, metavar="code_directory", type=str, help="The parent directory of all the submissions.")
-    parser.add_argument("-s", "--snippet_path", type=str, required=True, metavar="snippet_path", help="The path of the snippet code to check.")
+    parser.add_argument("-d", "--code-directory", required=True, metavar=code_directory_key, type=str, help="The parent directory of all the submissions.")
+    parser.add_argument("-s", "--snippet_path", type=str, required=True, metavar=snippet_path_key, help="The path of the snippet code to check.")
 
     args: Namespace = parser.parse_args()
     code_directory: str = args.code_directory

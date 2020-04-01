@@ -2,8 +2,8 @@ __author__ = "cloudstrife9999"
 
 from pwn import process
 from printer import print_exception_maybe
-from common import config
-
+from common import global_config
+from strings import *
 
 class PrologIO():
     def __init__(self, cmd):
@@ -18,7 +18,7 @@ class PrologIO():
         self.__timeout: int = self.__validate_timeout()
 
     def __validate_timeout(self) -> int:
-        timeout: int = config["timeout"]
+        timeout: int = global_config[timeout_key]
 
         if type(timeout) != int or timeout < 0:
             raise ValueError("{} is not a valid timeout value.")
@@ -89,7 +89,7 @@ class PrologIO():
         while True:
             tmp = self.__recv_utf8_str()
 
-            for error_pattern in config["error_patterns"]:
+            for error_pattern in global_config[error_patterns_key]:
                 if error_pattern in tmp:
                     raise SyntaxError(tmp)
             
@@ -98,7 +98,7 @@ class PrologIO():
                 break
 
     def __must_receive_again(self, data: str) -> bool:
-        for elm in config["keep_receiving_if_received"]:
+        for elm in global_config[keep_receiving_if_received_key]:
             if elm in data:
                 return True
         

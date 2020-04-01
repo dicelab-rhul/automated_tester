@@ -4,7 +4,8 @@ from colorama import Fore, Style
 from builder import build_final_result
 from traceback import print_exc
 from sys import stdout
-from common import config, storage
+from common import global_config, storage
+from strings import *
 from json import dumps
 
 
@@ -16,16 +17,18 @@ def print_missing_software_dependencies(missing: list) -> None:
 
 def print_submission_header() -> None:
     print("\n{}###################################################".format(Style.BRIGHT))
-    print("Checking {}".format(config["code_directory"]))
+    print("Checking {}".format(global_config["code_directory"]))
     print("###################################################{}".format(Style.RESET_ALL))
 
 
 def print_timeout_info() -> None:
-    print("\n{}{}INFO: the timeout for each query is {} seconds.{}".format(Style.BRIGHT, Fore.GREEN, config["timeout"], Style.RESET_ALL))
+    print("\n{}{}INFO: the timeout for each query is {} seconds.{}".format(Style.BRIGHT, Fore.GREEN, global_config[timeout_key], Style.RESET_ALL))
+
 
 def print_exception_maybe() -> None:
-    if config["exceptions_debug"]:
+    if global_config[exceptions_debug_key]:
         print_exc(file=stdout)
+
 
 def print_exception_message(e: Exception) -> None:
     print("{}{}{}{}".format(Style.BRIGHT, Fore.RED, str(e), Style.RESET_ALL))
@@ -44,18 +47,18 @@ def print_test_case_group(cmd: list) -> None:
 
 
 def print_test_cases_with_errors(submission_id: str) -> None:
-    test_cases_with_errors: list = storage["test_cases_with_errors"]
+    test_cases_with_errors: list = storage[test_cases_with_errors_key]
 
     if len(test_cases_with_errors) > 0:
         print("\n{}{}##### The following test cases for submission {} errored out. Some marks may be still awarded after a manual review. #####{}\n".format(Style.BRIGHT, Fore.RED, submission_id, Style.RESET_ALL))
 
         for test_case in test_cases_with_errors:
-            print("{}Part:     {}{}{}".format(Style.BRIGHT, Fore.MAGENTA, test_case["part"], Style.RESET_ALL))
-            print("{}Cmd:      {}{}{}".format(Style.BRIGHT, Fore.BLUE, test_case["cmd"], Style.RESET_ALL))
+            print("{}Part:     {}{}{}".format(Style.BRIGHT, Fore.MAGENTA, test_case[part_key], Style.RESET_ALL))
+            print("{}Cmd:      {}{}{}".format(Style.BRIGHT, Fore.BLUE, test_case[cmd_key], Style.RESET_ALL))
 
-            for query in test_case["queries"].keys():
+            for query in test_case[queries_key].keys():
                 print("{}Query:    {}{}{}".format(Style.BRIGHT, Fore.YELLOW, query, Style.RESET_ALL))
-            print("{}Reason:   {}{}{}".format(Style.BRIGHT, Fore.RED, test_case["reason"], Style.RESET_ALL))
+            print("{}Reason:   {}{}{}".format(Style.BRIGHT, Fore.RED, test_case[reason_key], Style.RESET_ALL))
             print()
 
         print()
@@ -121,11 +124,11 @@ def print_final_result(result: dict, submission_id: str) -> None:
         for k, v in res.items():
             buffer: str = " " * (longest_key_length - len(k))
 
-            if k == "correct":
+            if k == correct_key:
                 v = "{}{}{}".format(Fore.GREEN, v, Fore.WHITE)
-            elif k == "to_manually_review":
+            elif k == to_manually_review_key:
                 v = "{}{}{}".format(Fore.RED, v, Fore.WHITE)
-            elif k == "partial_mark":
+            elif k == partial_mark_key:
                 v = "{}{}{}".format(Fore.BLUE, v, Fore.WHITE)
                 
             print("    {}:{} {}".format(k, buffer, v))
