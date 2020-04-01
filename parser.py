@@ -12,7 +12,7 @@ except:
 
 class PrologOutputParser():
     def __init__(self):
-        self.__result_regex: str = "Res = \[.*\]\." #TODO: move this to the config file.
+        self.__result_regex: str = global_config[result_regex_key]
 
     def is_output_empty(self, output: str) -> bool:
         return output == ""

@@ -52,6 +52,7 @@ def load_general_config() -> None:
 
     global_config[parts_weights_key]: dict = config[parts_key]
     global_config[exceptions_debug_key]: bool = config[exceptions_debug_key]
+    global_config[result_regex_key]: str = config[result_regex_key]
 
     if global_config[timeout_key] is None:
         global_config[timeout_key] = config[timeout_key]

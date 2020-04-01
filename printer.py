@@ -50,7 +50,7 @@ def print_test_cases_with_errors(submission_id: str) -> None:
     test_cases_with_errors: list = storage[test_cases_with_errors_key]
 
     if len(test_cases_with_errors) > 0:
-        print("\n{}{}##### The following test cases for submission {} errored out. Some marks may be still awarded after a manual review. #####{}\n".format(Style.BRIGHT, Fore.RED, submission_id, Style.RESET_ALL))
+        print("\n{}{}##### The following test cases for submission {} errored out. #####{}\n".format(Style.BRIGHT, Fore.RED, submission_id, Style.RESET_ALL))
 
         for test_case in test_cases_with_errors:
             print("{}Part:     {}{}{}".format(Style.BRIGHT, Fore.MAGENTA, test_case[part_key], Style.RESET_ALL))
@@ -61,7 +61,7 @@ def print_test_cases_with_errors(submission_id: str) -> None:
             print("{}Reason:   {}{}{}".format(Style.BRIGHT, Fore.RED, test_case[reason_key], Style.RESET_ALL))
             print()
 
-        print()
+        print("{}{}##### Some marks may be still awarded after a manual review. #####{}\n".format(Style.BRIGHT, Fore.RED, Style.RESET_ALL))
     else:
         print("\n{}{}##### None of the test cases errored out. Good! #####{}\n".format(Style.BRIGHT, Fore.GREEN, Style.RESET_ALL))
 

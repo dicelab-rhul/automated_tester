@@ -9,5 +9,6 @@
         "T2(d)": 20
     },
     "timeout": 5,
-    "exceptions_debug": true
+    "exceptions_debug": true,
+    "result_regex": "Res = \\[.*\\]\\."
 }

@@ -28,6 +28,13 @@ class PrologIO():
     # This is for a potential concurrent-friendly re-implementation in the future.
     def start(self) -> None:
         self.run()
+
+    def stop(self) -> None:
+        self.__proc.kill()
+
+    def restart(self) -> None:
+        self.stop()
+        self.start()
     
     def run(self) -> None:
         try:
@@ -77,11 +84,11 @@ class PrologIO():
 
             return self.__recv_utf8_str()
         except SyntaxError as e:
-            self.__kill_and_restart_swipl()
+            self.restart()
 
             return str(e)
         except TimeoutError:
-            self.__kill_and_restart_swipl()
+            self.restart()
 
             return ""
 
@@ -106,8 +113,3 @@ class PrologIO():
 
     def __receive_and_discard(self) -> None:
         self.__recv_utf8_str()
-
-
-    def __kill_and_restart_swipl(self) -> None:
-        self.__proc.kill()
-        self.start()

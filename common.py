@@ -25,6 +25,7 @@ global_config: dict = {
         "global-stack",
         "Searching:"
     ],
+    result_regex_key: None,
     exceptions_debug_key: False
 }
 
