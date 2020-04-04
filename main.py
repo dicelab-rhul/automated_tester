@@ -21,7 +21,7 @@ def main() -> None:
     check_submission_validity()
     check_required_software()
     load_general_config()
-    print_timeout_info()
+    print_info()
 
     submission_id: str = build_submission_id(candidate=global_config[code_directory_key])
     test_cases: list = load_json(file_path=global_config[test_cases_file_key])

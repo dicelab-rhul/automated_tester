@@ -21,8 +21,9 @@ def print_submission_header() -> None:
     print("###################################################{}".format(Style.RESET_ALL))
 
 
-def print_timeout_info() -> None:
-    print("\n{}{}INFO: the timeout for each query is {} seconds.{}".format(Style.BRIGHT, Fore.GREEN, global_config[timeout_key], Style.RESET_ALL))
+def print_info() -> None:
+    print("\n{}{}INFO: the regex for the results is {}{}".format(Style.BRIGHT, Fore.GREEN, global_config[result_regex_key], Style.RESET_ALL))
+    print("{}{}INFO: the timeout for each query is {} seconds.{}".format(Style.BRIGHT, Fore.GREEN, global_config[timeout_key], Style.RESET_ALL))
 
 
 def print_exception_maybe() -> None:
