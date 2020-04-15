@@ -20,7 +20,7 @@ class PrologIO():
     def __validate_timeout(self) -> int:
         timeout: int = global_config[timeout_key]
 
-        if type(timeout) != int or timeout < 0:
+        if not isinstance(timeout, (int, float)) or timeout < 0:
             raise ValueError("{} is not a valid timeout value.")
         else:
             return timeout

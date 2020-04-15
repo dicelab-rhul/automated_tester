@@ -5,6 +5,6 @@
         "T3": 30
     },
     "timeout": 5,
-    "exceptions_debug": false,
+    "exceptions_debug": true,
     "result_regex": "Res = \\[.*\\]\\."
 }

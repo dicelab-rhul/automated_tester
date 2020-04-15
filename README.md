@@ -19,6 +19,7 @@ You may need to install the following (you may have to replace `apt`, depending 
 $ sudo apt install python3
 $ sudo apt install swipl
 $ pip3 install pwntools
+$ pip3 install stopit
 ```
 
 # Run the script an all the submissions
