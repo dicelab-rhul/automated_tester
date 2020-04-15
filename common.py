@@ -11,6 +11,7 @@ global_config: dict = {
     },
     parts_weights_key: {},
     timeout_key: None,
+    test_cases_file_key: "",
     code_directory_key: "",
     tests_directory_key: "",
     keep_receiving_if_received_key: [

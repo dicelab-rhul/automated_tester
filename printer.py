@@ -7,6 +7,7 @@ from sys import stdout
 from common import global_config, storage
 from strings import *
 from json import dumps
+from typing import Union
 
 
 def print_missing_software_dependencies(missing: list) -> None:
@@ -69,7 +70,7 @@ def print_test_cases_with_errors(submission_id: str) -> None:
     print("---------------------------------------------------\n")
 
 
-def print_test_outcome(cmd: list, query: str, passed: bool, expected_output: str, actual_output: str, order_matters: bool=False) -> bool:
+def print_test_outcome(cmd: list, query: str, passed: bool, expected_output: str, actual_output: str, order_matters: bool=False) -> None:
     if passed:
         passed_color = Fore.GREEN
     else:
@@ -103,8 +104,8 @@ def print_coincidence_warning_if_necessary(passed: bool, expected_output: str, a
         print("{}INFO:          {}Check whether this result is correct by coincidence.{}".format(Style.BRIGHT, Fore.YELLOW, Style.RESET_ALL))
 
 
-def print_test_outcome_if_missing_files(cmd: list, queries: list, missing_files: list) -> bool:
-    for query in queries:
+def print_test_outcome_if_missing_files(cmd: list, queries: dict, missing_files: list) -> None:
+    for query in queries.keys():
         print("{}Test case:   {}{}{}".format(Style.BRIGHT, Fore.BLUE, " ".join(cmd), Style.RESET_ALL))
         print("{}Query:       {}{}{}".format(Style.BRIGHT, Fore.BLUE, query, Style.RESET_ALL))
         print("{}Passed?      {}{}{}".format(Style.BRIGHT, Fore.RED, False, Style.RESET_ALL))
@@ -137,5 +138,5 @@ def print_final_result(result: dict, submission_id: str) -> None:
     print("\n---------------------------------------------------")
 
 
-def print_json(to_print: dict, indend=4, sort_keys=False) -> None:
+def print_json(to_print: Union[dict, list], indend=4, sort_keys=False) -> None:
     print(dumps(obj=to_print, indent=indend, sort_keys=sort_keys))

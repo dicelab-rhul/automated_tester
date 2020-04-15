@@ -7,10 +7,10 @@ from strings import *
 
 class PrologIO():
     def __init__(self, cmd):
-        if type(cmd) == list:
-            self.__cmd = cmd
-        elif type(cmd) == str:
-            self.__cmd = cmd.split(" ")
+        if isinstance(cmd, list):
+            self.__cmd: list = cmd
+        elif isinstance(cmd, str):
+            self.__cmd: list = cmd.split(" ")
         else:
             raise ValueError("Unsupported command type: {}".format(type(cmd)))
 

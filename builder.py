@@ -40,8 +40,8 @@ def build_swipl_command(test_case: dict, has_tests: bool) -> list:
     return cmd
 
 
-def build_errored_out_test_case_group(test_case: dict, cmd: list=[unknown_key], queries: list=[], reason: str=unknown_key) -> list:
-    return [build_errored_out_test_case(test_case=test_case, cmd=cmd, query=query, output=reason) for query in queries]
+def build_errored_out_test_case_group(test_case: dict, cmd: list=[unknown_key], queries: dict={}, reason: str=unknown_key) -> list:
+    return [build_errored_out_test_case(test_case=test_case, cmd=cmd, query=query, output=reason) for query in queries.keys()]
 
 
 def build_errored_out_test_case(test_case: dict, cmd: list, query: str, output: str) -> dict:

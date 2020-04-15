@@ -1,13 +1,15 @@
 __author__ = "cloudstrife9999"
 
-from re import match, sre_compile
+from re import match
 from common import global_config
 from strings import *
 
 try:
     from re import Match
 except:
-    Match = type(sre_compile.compile('', 0).match(''))
+    from re.sre_compile import compile
+    
+    Match = type(compile('', 0).match(''))
 
 
 class PrologOutputParser():
@@ -28,7 +30,7 @@ class PrologOutputParser():
         m: Match = match(self.__result_regex, output)
 
         if m:
-            return m[0]
+            return str(m[0])
         else:
             return output
 

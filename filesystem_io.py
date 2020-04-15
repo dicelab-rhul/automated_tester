@@ -7,6 +7,7 @@ from shutil import which
 from json import load
 from common import global_config
 from strings import *
+from typing import Iterable
 
 
 def list_missing_software() -> list:
@@ -37,16 +38,16 @@ def list_empty_files(code_directory: str) -> list:
     empty: list = []
 
     for f in yield_all_useful_files_in_directory(directory=code_directory):
-        if is_file_empty_for_all_intents_and_purposes(dir=dir, f=f):
+        if is_file_empty_for_all_intents_and_purposes(f=f):
             empty.append(os.path.basename(f))
 
+    return empty
 
-def is_file_empty_for_all_intents_and_purposes(dir: str, f: str) -> bool:
-    file_path: str = os.path.join(dir, f)
 
-    _check_file(file_path=file_path)
+def is_file_empty_for_all_intents_and_purposes(f: str) -> bool:
+    _check_file(file_path=f)
 
-    lines = load_stripped_lines(file_path=file_path)
+    lines = load_stripped_lines(file_path=f)
 
     for line in lines:
         if len(line) > 0:
@@ -146,13 +147,13 @@ def _check_file(file_path: str) -> None:
         raise ValueError("{} is not a valid regular file or symlink.".format(file_path))
 
 
-def yield_all_useful_files_in_directory(directory: str, extensions:list=None) -> iter:
+def yield_all_useful_files_in_directory(directory: str, extensions:list=None) -> Iterable:
     if extensions is None:
         extensions = global_config[notable_extensions_key]
 
-    for dir, _, files in walk(directory):
+    for d, _, files in walk(directory):
         for f in files:
             for extension in extensions:
                 if f.endswith(extension):
-                    yield os.path.join(dir, f)
+                    yield os.path.join(d, f)
                     break

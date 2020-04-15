@@ -12,6 +12,7 @@ from parser import PrologOutputParser
 from prolog_io import PrologIO
 from common import global_config
 from strings import *
+from typing import Union
 
 
 def main() -> None:
@@ -24,7 +25,7 @@ def main() -> None:
     print_info()
 
     submission_id: str = build_submission_id(candidate=global_config[code_directory_key])
-    test_cases: list = load_json(file_path=global_config[test_cases_file_key])
+    test_cases: Union[list, dict] = load_json(file_path=global_config[test_cases_file_key])
     result: dict = check_submission(test_cases=test_cases)
 
     print_test_cases_with_errors(submission_id=submission_id)
@@ -50,9 +51,9 @@ def check_required_software() -> None:
 def load_general_config() -> None:
     config: dict = load_json(file_path=global_config[config_file_key])
 
-    global_config[parts_weights_key]: dict = config[parts_key]
-    global_config[exceptions_debug_key]: bool = config[exceptions_debug_key]
-    global_config[result_regex_key]: str = config[result_regex_key]
+    global_config[parts_weights_key] = config[parts_key]
+    global_config[exceptions_debug_key] = config[exceptions_debug_key]
+    global_config[result_regex_key] = config[result_regex_key]
 
     if global_config[timeout_key] is None:
         global_config[timeout_key] = config[timeout_key]
@@ -68,14 +69,14 @@ def parse_cli_arguments() -> None:
 
     args: Namespace = parser.parse_args()
 
-    global_config[code_directory_key]: str = args.code_directory
-    global_config[tests_directory_key]: str = args.tests_directory
+    global_config[code_directory_key] = args.code_directory
+    global_config[tests_directory_key] = args.tests_directory
     global_config[timeout_key] = args.test_timeout
-    global_config[test_cases_file_key]: str = args.test_cases_file
-    global_config[config_file_key]: str = args.config_file
+    global_config[test_cases_file_key] = args.test_cases_file
+    global_config[config_file_key] = args.config_file
 
 
-def check_submission(test_cases: list) -> dict:
+def check_submission(test_cases: Union[list, dict]) -> dict:
     rename_incorrectly_named_efficient_searches_files()
 
     test_result: dict = build_test_result_stub()
@@ -97,7 +98,7 @@ def check_test_case(test_case: dict, test_result: dict) -> dict:
     return do_check_test_case(test_case=test_case, cmd=cmd, part=part, queries=queries, test_result=test_result)
 
 
-def do_check_test_case(test_case: dict, cmd: list, part: str, queries: list, test_result: dict) -> dict:
+def do_check_test_case(test_case: dict, cmd: list, part: str, queries: dict, test_result: dict) -> dict:
     try:
         missing_files: list = list_missing_files(cmd=cmd, test_files_excluded=True)
 
@@ -125,14 +126,14 @@ def do_check_test_case(test_case: dict, cmd: list, part: str, queries: list, tes
 
 
 
-def save_errored_out_test_cases(test_case: dict, cmd: list, queries: list, reason: str) -> None:
+def save_errored_out_test_cases(test_case: dict, cmd: list, queries: dict, reason: str) -> None:
     test_case_with_errors_group: list = build_errored_out_test_case_group(test_case=test_case, cmd=cmd, queries=queries, reason=reason)
         
     for test_case_with_errors in test_case_with_errors_group:
         storage[test_cases_with_errors_key].append(test_case_with_errors)
 
 
-def run_queries(cmd: list, test_case: dict, test_result: dict, part: str, queries: list, p: PrologIO) -> tuple:
+def run_queries(cmd: list, test_case: dict, test_result: dict, part: str, queries: dict, p: PrologIO) -> tuple:
     parser: PrologOutputParser = PrologOutputParser()
     correct: int = 0
     to_review: int = 0

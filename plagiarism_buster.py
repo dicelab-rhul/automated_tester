@@ -64,7 +64,7 @@ def main() -> None:
     args: Namespace = parser.parse_args()
     code_directory: str = args.code_directory
     snippet: list = load_lines_without_trailing_newlines(file_path=args.snippet_path)
-    duplicates: dict = look_for_plagiarism(code_directory=code_directory, snippet=snippet)
+    duplicates: list = look_for_plagiarism(code_directory=code_directory, snippet=snippet)
 
     print_json(to_print=duplicates)
 
