@@ -1,8 +1,6 @@
 __author__ = "cloudstrife9999"
 
 from re import match
-from common import global_config
-from strings import *
 
 try:
     from re import Match
@@ -10,6 +8,9 @@ except:
     from re.sre_compile import compile
     
     Match = type(compile('', 0).match(''))
+
+from common import global_config
+from strings import *
 
 
 class PrologOutputParser():

@@ -3,6 +3,7 @@
 __author__ = "cloudstrife9999"
 
 from argparse import ArgumentParser, Namespace
+
 from filesystem_io import load_lines_without_trailing_newlines, yield_all_useful_files_in_directory
 from printer import print_json
 from builder import build_submission_id

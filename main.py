@@ -5,6 +5,8 @@ __author__ = "cloudstrife9999"
 from argparse import ArgumentParser, Namespace
 from sys import exit
 from colorama import init as colorama_init
+from typing import Union
+
 from filesystem_io import *
 from printer import *
 from builder import *
@@ -12,7 +14,6 @@ from parser import PrologOutputParser
 from prolog_io import PrologIO
 from common import global_config
 from strings import *
-from typing import Union
 
 
 def main() -> None:
@@ -65,7 +66,7 @@ def parse_cli_arguments() -> None:
     parser.add_argument("-t", "--tests-directory", required=False, metavar=tests_directory_key, type=str, help="The directory which contains the tests.")
     parser.add_argument("-c", "--test-cases-file", required=True, metavar=test_cases_file_key, type=str, help="The test cases file.")
     parser.add_argument("-C", "--config-file", required=True, metavar=config_file_key, type=str, help="The config file.")
-    parser.add_argument("-T", "--test-timeout", required=False, metavar=test_timeout_key, type=int, help="The timeout for each test in seconds.")
+    parser.add_argument("-T", "--test-timeout", required=False, metavar=test_timeout_key, type=Union[int, float], help="The timeout for each test in seconds.")
 
     args: Namespace = parser.parse_args()
 

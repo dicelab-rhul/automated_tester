@@ -1,5 +1,6 @@
 from strings import *
 
+
 global_config: dict = {
     required_software_key: [
         "swipl"

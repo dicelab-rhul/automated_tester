@@ -1,13 +1,14 @@
 __author__ = "cloudstrife9999"
 
 from colorama import Fore, Style
-from builder import build_final_result
-from traceback import print_exc
-from sys import stdout
-from common import global_config, storage
-from strings import *
 from json import dumps
 from typing import Union
+from traceback import print_exc
+from sys import stdout
+
+from builder import build_final_result
+from common import global_config, storage
+from strings import *
 
 
 def print_missing_software_dependencies(missing: list) -> None:

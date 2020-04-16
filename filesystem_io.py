@@ -1,13 +1,13 @@
 __author__ = "cloudstrife9999"
 
-import os
-
-from os import walk, rename, listdir
 from shutil import which
 from json import load
+from typing import Iterable
+
 from common import global_config
 from strings import *
-from typing import Iterable
+
+import os
 
 
 def list_missing_software() -> list:
@@ -30,7 +30,7 @@ def validate_submission():
     if tests_directory is not None and not os.path.isdir(tests_directory):
         raise IOError("{} is not a valid directory. Aborting...".format(tests_directory))
 
-    if not listdir(code_directory):
+    if not os.listdir(code_directory):
         raise IOError("Empty submission for {}. Aborting...".format(os.path.basename(code_directory)))
 
 
@@ -95,7 +95,7 @@ def rename_incorrectly_named_efficient_searches_files() -> None:
 
         if possibly_incorrect_name in global_config[common_misspellings_key].keys():
             correct_name: str = global_config[common_misspellings_key][possibly_incorrect_name]
-            rename(f, os.path.join(os.path.dirname(f), correct_name))
+            os.rename(f, os.path.join(os.path.dirname(f), correct_name))
 
 
 def load_lines(file_path: str, min_len: int=1) -> list:
@@ -151,7 +151,7 @@ def yield_all_useful_files_in_directory(directory: str, extensions:list=None) ->
     if extensions is None:
         extensions = global_config[notable_extensions_key]
 
-    for d, _, files in walk(directory):
+    for d, _, files in os.walk(directory):
         for f in files:
             for extension in extensions:
                 if f.endswith(extension):

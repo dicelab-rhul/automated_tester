@@ -1,9 +1,12 @@
 __author__ = "cloudstrife9999"
 
+from typing import Union
+
 from pwn import process
 from printer import print_exception_maybe
 from common import global_config
 from strings import *
+
 
 class PrologIO():
     def __init__(self, cmd):
@@ -14,16 +17,30 @@ class PrologIO():
         else:
             raise ValueError("Unsupported command type: {}".format(type(cmd)))
 
-        self.__proc: process = None
-        self.__timeout: int = self.__validate_timeout()
+        self.__timeout: Union[int, float] = self.__validate_timeout()
 
-    def __validate_timeout(self) -> int:
-        timeout: int = global_config[timeout_key]
+    def __validate_timeout(self) -> Union[int, float]:
+        timeout: Union[int, float] = global_config[timeout_key]
 
         if not isinstance(timeout, (int, float)) or timeout < 0:
             raise ValueError("{} is not a valid timeout value.")
         else:
             return timeout
+
+##### BEGIN GETTERS #####
+    def get_cmd(self) -> list:
+        return self.__cmd
+
+    def get_cmd_string(self) -> str:
+        return " ".join(self.__cmd)
+
+    def get_timeout(self) -> Union[int, float]:
+        return self.__timeout
+
+    def get_wrapped_process(self) -> process:
+        return self.__proc
+
+##### END GETTERS #####
 
     # This is for a potential concurrent-friendly re-implementation in the future.
     def start(self) -> None:
@@ -38,7 +55,7 @@ class PrologIO():
     
     def run(self) -> None:
         try:
-            self.__proc = process(self.__cmd)
+            self.__proc: process = process(self.__cmd)
 
             # This command tells swipl not to abbreviate its output anymore.
             self.__proc.sendline("set_prolog_flag(answer_write_options,[quoted(true), portray(true), spacing(next_argument)]).")
