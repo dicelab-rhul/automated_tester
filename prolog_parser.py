@@ -1,10 +1,11 @@
 __author__ = "cloudstrife9999"
 
 from re import match
+from typing import Optional
 
-try:
+if hasattr(__import__("re"), "Match"):
     from re import Match
-except:
+else:
     from re.sre_compile import compile
     
     Match = type(compile('', 0).match(''))
@@ -28,7 +29,7 @@ class PrologOutputParser():
         return False
 
     def parse_output(self, output: str) -> str:
-        m: Match = match(self.__result_regex, output)
+        m: Optional[Match[str]] = match(self.__result_regex, output)
 
         if m:
             return str(m[0])

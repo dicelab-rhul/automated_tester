@@ -10,7 +10,7 @@ from typing import Union
 from filesystem_io import *
 from printer import *
 from builder import *
-from parser import PrologOutputParser
+from prolog_parser import PrologOutputParser
 from prolog_io import PrologIO
 from common import global_config
 from strings import *

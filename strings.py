@@ -1,3 +1,5 @@
+__author__ = "cloudstrife9999"
+
 code_directory_key: str = "code_directory"
 tests_directory_key: str = "tests_directory"
 test_cases_file_key: str = "test_cases_file"

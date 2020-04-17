@@ -20,7 +20,7 @@ You may need to install the following (you may have to replace `apt`, depending 
 ```console
 $ sudo apt install python3
 $ sudo apt install swipl
-$ pip3 install pwntools stopit
+$ pip3 install pwntools
 ...
 ```
 
