@@ -20,13 +20,13 @@ def print_missing_software_dependencies(missing: list) -> None:
 
 def print_submission_header() -> None:
     print("\n{}###################################################".format(Style.BRIGHT))
-    print("Checking {}".format(global_config["code_directory"]))
+    print("Checking {}".format(global_config[code_directory_key]))
     print("###################################################{}".format(Style.RESET_ALL))
 
 
 def print_footer() -> None:
     try:
-        submission_id: int = int(os.path.basename(global_config["code_directory"]))
+        submission_id: int = int(os.path.basename(global_config[code_directory_key]))
 
         # Well, for the lulz...
         if submission_id % 7 == 0:
