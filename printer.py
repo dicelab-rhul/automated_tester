@@ -10,6 +10,7 @@ from builder import build_final_result
 from common import global_config, storage
 from strings import *
 
+import os
 
 def print_missing_software_dependencies(missing: list) -> None:
     for elm in missing:
@@ -22,6 +23,19 @@ def print_submission_header() -> None:
     print("Checking {}".format(global_config["code_directory"]))
     print("###################################################{}".format(Style.RESET_ALL))
 
+
+def print_footer() -> None:
+    try:
+        submission_id: int = int(os.path.basename(global_config["code_directory"]))
+
+        # Well, for the lulz...
+        if submission_id % 7 == 0:
+            print("\n{}{}#################################################################".format(Style.BRIGHT, Fore.YELLOW))
+            print("Final Fantasy VII is the best Final Fantasy. Hype for the remake!")
+            print("#################################################################{}".format(Style.RESET_ALL))
+            print("\n---------------------------------------------------\n")
+    except:
+        return
 
 def print_info() -> None:
     print("\n{}{}INFO: the regex for the results is {}{}".format(Style.BRIGHT, Fore.GREEN, global_config[result_regex_key], Style.RESET_ALL))

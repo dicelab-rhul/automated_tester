@@ -31,6 +31,7 @@ def main() -> None:
 
     print_test_cases_with_errors(submission_id=submission_id)
     print_final_result(result=result, submission_id=submission_id)
+    print_footer()
 
 
 def check_submission_validity() -> None:

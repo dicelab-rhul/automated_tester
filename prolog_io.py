@@ -9,7 +9,7 @@ from strings import *
 
 
 class PrologIO():
-    def __init__(self, cmd):
+    def __init__(self, cmd: Union[str, list]):
         if isinstance(cmd, list):
             self.__cmd: list = cmd
         elif isinstance(cmd, str):
