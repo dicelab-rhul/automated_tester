@@ -3,8 +3,10 @@
         "cmd": "swipl students.pl test.pl",
         "queries": {
             "findall(X, pass_year(X), Res).": "Res = [bob, mary].",
-            "findall(X, fail(X), Res).": "Res = [pat].",
             "findall(X:E, resit(X, E), Res).": "Res = [tony:e1]."
+        },
+        "removed_queries": {
+            "findall(X, fail(X), Res).": "Res = [pat]."
         },
         "has_tests": true,
         "order_matters": false,
