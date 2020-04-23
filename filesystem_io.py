@@ -3,6 +3,7 @@ __author__ = "cloudstrife9999"
 from shutil import which
 from json import load
 from typing import Iterable
+from string import whitespace
 
 from common import global_config
 from strings import *
@@ -47,9 +48,7 @@ def list_empty_files(code_directory: str) -> list:
 def is_file_empty_for_all_intents_and_purposes(f: str) -> bool:
     _check_file(file_path=f)
 
-    lines = load_stripped_lines(file_path=f)
-
-    for line in lines:
+    for line in [__remove_meaningless_characters(line=line) for line in load_lines(file_path=f, min_len=1)]:
         if len(line) > 0:
             return False
 
@@ -64,7 +63,7 @@ def list_missing_files(cmd: list, test_files_excluded: bool=True) -> list:
         name: str = os.path.basename(f)
         if test_files_excluded and name.startswith(test_prefix):
             continue
-        elif not os.path.isfile(f):
+        elif not os.path.isfile(f) or is_file_empty_for_all_intents_and_purposes(f=f):
             missing_files.append(name)
 
     return missing_files
@@ -108,8 +107,14 @@ def load_lines(file_path: str, min_len: int=1) -> list:
         raise IOError("There was an error while accessing or reading {}".format(file_path)) from e
 
 
-def load_stripped_lines(file_path: str, min_len: int=1) -> list:
-    return [line.strip() for line in load_lines(file_path=file_path, min_len=min_len)]
+def __remove_meaningless_characters(line: str) -> str:
+    new_line: str = ""
+
+    for c in line:
+        if c not in whitespace:
+            new_line += c
+
+    return new_line
 
 
 def load_lines_without_trailing_newlines(file_path: str, min_len: int=1) -> list:

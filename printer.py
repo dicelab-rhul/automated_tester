@@ -124,7 +124,7 @@ def print_test_outcome_if_missing_files(cmd: list, queries: dict, missing_files:
         print("{}Test case:   {}{}{}".format(Style.BRIGHT, Fore.BLUE, " ".join(cmd), Style.RESET_ALL))
         print("{}Query:       {}{}{}".format(Style.BRIGHT, Fore.BLUE, query, Style.RESET_ALL))
         print("{}Passed?      {}{}{}".format(Style.BRIGHT, Fore.RED, False, Style.RESET_ALL))
-        print("{}Reason:      {}Missing {}{}".format(Style.BRIGHT, Fore.YELLOW, missing_files, Style.RESET_ALL))
+        print("{}Reason:      {}Missing or empty {}{}".format(Style.BRIGHT, Fore.YELLOW, missing_files, Style.RESET_ALL))
         print("---------------------------------------------------")
 
 

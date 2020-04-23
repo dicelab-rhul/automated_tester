@@ -2,6 +2,7 @@
 
 # This is to test a single submission.
 
+: '
 PIP3="pip3"
 SWIPL="swipl"
 PWNTOOLS="pwntools"
@@ -20,6 +21,7 @@ for PACKAGE in ${PWNTOOLS} ${COLORAMA}; do
         exit -1
     fi
 done
+'
 
 if [ -z "${1}" ]; then
     echo "Usage: ${0} <assignment_code_directory_path>"

@@ -106,7 +106,7 @@ def do_check_test_case(test_case: dict, cmd: list, part: str, queries: dict, tes
 
         if missing_files:
             print_test_outcome_if_missing_files(cmd=cmd, queries=queries, missing_files=missing_files)
-            reason: str = "Missing {}".format(missing_files)
+            reason: str = "Missing or empty {}".format(missing_files)
             save_errored_out_test_cases(test_case=test_case, cmd=cmd, queries=queries, reason=reason)
             test_result[part][to_manually_review_key] += len(queries)
             
