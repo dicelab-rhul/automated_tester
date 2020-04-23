@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 if hasattr(__import__("re"), "Match"):
     from re import Match
 else:
-    from re.sre_compile import compile
+    from re import compile
     
     Match = type(compile('', 0).match(''))
 

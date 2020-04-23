@@ -5,6 +5,7 @@
 PIP3="python3-pip"
 SWIPL="swipl"
 PWNTOOLS="pwntools"
+COLORAMA="colorama"
 
 for PACKAGE in ${PIP} ${SWIPL}; do
     if ! which ${PACKAGE} 1>/dev/null; then
@@ -13,10 +14,12 @@ for PACKAGE in ${PIP} ${SWIPL}; do
     fi
 done
 
-if ! pip3 list | grep -F ${PWNTOOLS} 1>/dev/null; then
-    echo "${PWNTOOLS} not found. Aborting..."
-    exit -1
-fi
+for PACKAGE in ${PWNTOOLS} ${COLORAMA}; do
+    if ! pip3 list 2>/dev/null | grep -F ${PACKAGE} 1>/dev/null; then
+        echo "${PACKAGE} not installed (pip3 install ${PACKAGE}). Aborting..."
+        exit -1
+    fi
+done
 
 chmod 700 main.py
 

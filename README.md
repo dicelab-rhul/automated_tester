@@ -18,9 +18,9 @@ MS Windows is currently not supported, because of the `pwntools` dependency.
 You may need to install the following (you may have to replace `apt`, depending on your OS):
 
 ```console
-$ sudo apt install python3
+$ sudo apt install python3 python3-pip
 $ sudo apt install swipl
-$ pip3 install pwntools
+$ pip3 install pwntools colorama
 ...
 ```
 
