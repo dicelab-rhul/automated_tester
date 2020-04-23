@@ -2,7 +2,7 @@
 
 # This is to test a single submission.
 
-PIP3="python3-pip"
+PIP3="pip3"
 SWIPL="swipl"
 PWNTOOLS="pwntools"
 COLORAMA="colorama"
@@ -15,8 +15,8 @@ for PACKAGE in ${PIP} ${SWIPL}; do
 done
 
 for PACKAGE in ${PWNTOOLS} ${COLORAMA}; do
-    if ! pip3 list 2>/dev/null | grep -F ${PACKAGE} 1>/dev/null; then
-        echo "${PACKAGE} not installed (pip3 install ${PACKAGE}). Aborting..."
+    if ! ${PIP3} list 2>/dev/null | grep -F ${PACKAGE} 1>/dev/null; then
+        echo "${PACKAGE} not installed (${PIP3} install ${PACKAGE}). Aborting..."
         exit -1
     fi
 done
