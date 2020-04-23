@@ -3,7 +3,7 @@ __author__ = "cloudstrife9999"
 from shutil import which
 from json import load
 from typing import Iterable
-from string import whitespace
+from string import whitespace, printable
 
 from common import global_config
 from strings import *
@@ -111,7 +111,7 @@ def __remove_meaningless_characters(line: str) -> str:
     new_line: str = ""
 
     for c in line:
-        if c not in whitespace:
+        if c not in whitespace and c in printable:
             new_line += c
 
     return new_line
