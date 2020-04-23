@@ -42,7 +42,7 @@ class PrologOutputParser():
 
         outcome: bool = result == expected_result
         
-        title: str = "\"Prolog Primer\""
+        title: str = "Prolog Primer"
 
         ##### BEGIN ASSIGNMENT_2 EQUIVALENCE CLASS #####
         # TODO: implement the equivalence of multiple solutions in a more scalable way.
@@ -59,13 +59,13 @@ class PrologOutputParser():
         return outcome
 
     # TODO: implement the equivalence of multiple solutions in a more scalable way.
-    def __check_for_prolog_primer_book_title_equivalence(self, result: str, expected_result: str, title: str) -> Tuple[bool, str]:    
-        if not title in expected_result:
-            return False, result
+    def __check_for_prolog_primer_book_title_equivalence(self, result: str, expected_result: str, title: str) -> Tuple[bool, str]:
+        real_title: str = "\"{}\"".format(title)
 
-        for candidate in ("'Prolog Primer'", "'prolog primer'", "\"prolog primer\"", "prolog_primer"):
+        for candidate in ("\"Prolog Primer\"", "'Prolog Primer'", "'prolog primer'", "\"prolog primer\"", "prolog_primer"):
             if candidate in result:
-                result = result.replace(candidate, title)
+                result = result.replace(candidate, real_title)
+                break
 
         return result == expected_result, result
 
