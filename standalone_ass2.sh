@@ -2,10 +2,19 @@
 
 # This is to test a single submission.
 
+PIP3="python3-pip"
 SWIPL="swipl"
+PWNTOOLS="pwntools"
 
-if ! which ${SWIPL} 1>/dev/null; then
-    echo "${SWIPL} not found. Aborting..."
+for PACKAGE in ${PIP} ${SWIPL}; do
+    if ! which ${PACKAGE} 1>/dev/null; then
+        echo "${PACKAGE} not found. Aborting..."
+        exit -1
+    fi
+done
+
+if ! pip3 list | grep -F ${PWNTOOLS} 1>/dev/null; then
+    echo "${PWNTOOLS} not found. Aborting..."
     exit -1
 fi
 

@@ -5,7 +5,8 @@
             "findall(X, pass_year(X), Res).": "Res = [bob, mary].",
             "findall(X:E, resit(X, E), Res).": "Res = [tony:e1]."
         },
-        "removed_queries": {
+        "backup_queries": {
+            "findall(X, pass(X), Res).": "Res = [bob, mary].",
             "findall(X, fail(X), Res).": "Res = [pat]."
         },
         "has_tests": true,

@@ -3,9 +3,7 @@
 assignment1
 assignment1bis
 assignment2
-assignment3
-assignment4
-assignment5
+assignment2.late
 *.pyc
 __pycache__/**
 output*

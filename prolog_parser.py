@@ -63,7 +63,7 @@ class PrologOutputParser():
         if not title in expected_result:
             return False, result
 
-        for candidate in ("'Prolog Primer'", "'prolog primer'", "\"prolog primer\""):
+        for candidate in ("'Prolog Primer'", "'prolog primer'", "\"prolog primer\"", "prolog_primer"):
             if candidate in result:
                 result = result.replace(candidate, title)
 
